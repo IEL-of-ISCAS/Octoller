@@ -22,6 +22,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="cn.ac.iscas.iel.vr.octoller.PickingActivity"
+            android:label="@string/title_activity_picking" >
+        </activity>
     </application>
 
 </manifest>

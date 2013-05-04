@@ -11,5 +11,6 @@
     <string name="manipulator_flight">飞行器</string>
     <string name="manipulator_drive">驾驶</string>
     <string name="manipulator_ufo">UFO</string>
+    <string name="title_activity_picking">锁定视角</string>
 
 </resources>
