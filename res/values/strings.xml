@@ -2,10 +2,14 @@
 <resources>
 
     <string name="app_name">Octoller</string>
-    <string name="action_settings">Settings</string>
-    <string name="action_login">Login</string>
-    <string name="action_request_master">Request Master</string>
-    <string name="action_logout">Logout</string>
-    <string name="action_release_master">Release Master</string>
+    <string name="action_settings">设置</string>
+    <string name="action_connect">连接</string>
+    <string name="action_request_master">申请控制权</string>
+    <string name="action_disconnect">断开</string>
+    <string name="action_release_master">释放控制权</string>
+    <string name="manipulator_trackball">跟踪球</string>
+    <string name="manipulator_flight">飞行器</string>
+    <string name="manipulator_drive">驾驶</string>
+    <string name="manipulator_ufo">UFO</string>
 
 </resources>

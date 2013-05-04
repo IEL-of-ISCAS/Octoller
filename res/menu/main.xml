@@ -1,5 +1,31 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <group android:id="@+id/group_connectivity" >
+        <item
+            android:id="@+id/action_connect"
+            android:orderInCategory="100"
+            android:showAsAction="always"
+            android:title="@string/action_connect"/>
+        <item
+            android:id="@+id/action_disconnect"
+            android:orderInCategory="100"
+            android:showAsAction="always"
+            android:visible="false"
+            android:title="@string/action_disconnect"/>
+    </group>
+    <group android:id="@+id/group_controllability">
+        <item
+            android:id="@+id/action_request_master"
+            android:orderInCategory="100"
+            android:showAsAction="always"
+            android:title="@string/action_request_master"/>
+        <item
+            android:id="@+id/action_release_master"
+            android:orderInCategory="100"
+            android:showAsAction="always"
+            android:title="@string/action_release_master" android:visible="false"/>
+    </group>
+
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
