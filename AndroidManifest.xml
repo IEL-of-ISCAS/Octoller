@@ -7,8 +7,9 @@
     <uses-sdk
         android:minSdkVersion="11"
         android:targetSdkVersion="11" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -27,6 +28,10 @@
         <activity
             android:name="cn.ac.iscas.iel.vr.octoller.PickingActivity"
             android:label="@string/title_activity_picking" >
+        </activity>
+        <activity
+            android:name="cn.ac.iscas.iel.vr.octoller.SettingsActivity"
+            android:label="@string/title_activity_settings" >
         </activity>
     </application>
 

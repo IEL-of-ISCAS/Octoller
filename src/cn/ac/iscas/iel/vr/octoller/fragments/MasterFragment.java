@@ -116,7 +116,6 @@ public class MasterFragment extends Fragment {
 				case MotionEvent.ACTION_CANCEL:
 					mMainActivity.pauseSensor();
 					mMainActivity.getDevice().stopSampling();
-					mMainActivity.getDevice().stopSending();
 					break;
 				}
 				return true;

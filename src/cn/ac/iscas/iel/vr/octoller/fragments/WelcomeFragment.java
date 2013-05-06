@@ -14,8 +14,14 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import cn.ac.iscas.iel.csdtp.controller.Device;
+import cn.ac.iscas.iel.csdtp.data.ControlFrame;
+import cn.ac.iscas.iel.csdtp.data.Frame;
+import cn.ac.iscas.iel.vr.octoller.MainActivity;
 import cn.ac.iscas.iel.vr.octoller.R;
-import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 
 /**
  * The fragment that display the welcome page
@@ -29,6 +35,8 @@ import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
  * @since
  */
 public class WelcomeFragment extends Fragment {
+	
+	protected ImageView mIvOctopus;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -40,12 +48,16 @@ public class WelcomeFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		return inflater.inflate(R.layout.fragment_welcome, container, false);
+		View view = inflater.inflate(R.layout.fragment_welcome, container, false);
+		mIvOctopus = (ImageView) view.findViewById(R.id.iv_octopus);
+		return view;
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		mIvOctopus.clearAnimation();
 	}
 
 	@Override
@@ -67,9 +79,14 @@ public class WelcomeFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_connect:
-			// send network request?
-			FragmentTransactionHelper.transTo(this, new SlaveryFragment(),
-					"slaveryFragment", true);
+			MainActivity mainActivity = (MainActivity) getActivity();
+			Device mainDevice = mainActivity.getDevice();
+			ControlFrame frame = new ControlFrame(mainDevice,
+					Frame.MSG_TYPE_NEWCONNECT);
+			mainDevice.pushToSendQueue(frame);
+			
+			Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.loading);
+			mIvOctopus.startAnimation(animation);
 
 			return true;
 		default:

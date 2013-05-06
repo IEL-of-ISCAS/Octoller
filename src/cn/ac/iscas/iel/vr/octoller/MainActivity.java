@@ -2,19 +2,27 @@ package cn.ac.iscas.iel.vr.octoller;
 
 import android.app.Activity;
 import android.app.Service;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
+import cn.ac.iscas.iel.csdtp.channel.IChannelCallback;
 import cn.ac.iscas.iel.csdtp.channel.SocketOutputChannel;
 import cn.ac.iscas.iel.csdtp.controller.AccelerometersSensor;
 import cn.ac.iscas.iel.csdtp.controller.Device;
 import cn.ac.iscas.iel.csdtp.controller.MagnetometersSensor;
 import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
+import cn.ac.iscas.iel.csdtp.data.Frame;
+import cn.ac.iscas.iel.csdtp.data.ResponseData;
 import cn.ac.iscas.iel.csdtp.data.SensorData;
 import cn.ac.iscas.iel.csdtp.exception.ChangeSensorWhileCollectingDataException;
+import cn.ac.iscas.iel.vr.octoller.fragments.SlaveryFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 
@@ -34,6 +42,7 @@ public class MainActivity extends Activity {
 	private Sensor mPhyRotSensor;
 
 	private MainSensorListener mSensorListener;
+	private ChannelResponseCallback mChannelResponse;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -41,7 +50,9 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 
 		mDevice = new Device("android");
-		mDevice.setOutputChannel(new SocketOutputChannel(SERVER_IP, SERVER_PORT));
+		mChannelResponse = new ChannelResponseCallback();
+		mDevice.setOutputChannel(new SocketOutputChannel(SERVER_IP, SERVER_PORT, mChannelResponse));
+		mDevice.startSending();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
 		mPhyAccSensor = mSensorManager
@@ -64,8 +75,16 @@ public class MainActivity extends Activity {
 		}
 
 		mSensorListener = new MainSensorListener();
+
+		FragmentTransactionHelper.transTo(this, new WelcomeFragment(),
+				"welcomeFragment", true);
+	}
+	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
 		
-		FragmentTransactionHelper.transTo(this, new WelcomeFragment(), "welcomeFragment", true);
+		mDevice.stopSending();
 	}
 
 	public Device getDevice() {
@@ -76,6 +95,19 @@ public class MainActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_settings:
+			Intent settingsIntent = new Intent(MainActivity.this,
+					SettingsActivity.class);
+			MainActivity.this.startActivity(settingsIntent);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 	@Override
@@ -133,6 +165,24 @@ public class MainActivity extends Activity {
 				mRotSensor.updateSnapshot(data);
 			}
 		}
+	}
+	
+	protected class ChannelResponseCallback implements IChannelCallback {
+
+		@Override
+		public void onResponse(ResponseData data) {
+			if(data.getMsgType() == Frame.MSG_TYPE_NEWCONNECT) {
+				if(data.getStatus() == Frame.STATUS_SUCCESS) {
+					FragmentTransactionHelper.transTo(MainActivity.this, new SlaveryFragment(),
+							"slaveryFragment", true);
+				} else {
+					Toast.makeText(MainActivity.this, data.getErrorMsg(), Toast.LENGTH_LONG).show();
+				}
+			}
+			
+			Log.d("ChannelResponseCallback", data.getMsgType() + "  " + data.getStatus() + "  " + data.getErrorMsg());
+		}
+		
 	}
 
 }
