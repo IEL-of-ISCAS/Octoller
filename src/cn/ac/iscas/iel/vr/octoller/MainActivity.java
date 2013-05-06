@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import cn.ac.iscas.iel.csdtp.channel.IChannelCallback;
+import cn.ac.iscas.iel.csdtp.channel.OutputChannel;
 import cn.ac.iscas.iel.csdtp.channel.SocketOutputChannel;
 import cn.ac.iscas.iel.csdtp.controller.AccelerometersSensor;
 import cn.ac.iscas.iel.csdtp.controller.Device;
@@ -36,6 +37,7 @@ public class MainActivity extends Activity {
 	private static final int SERVER_PORT = 6666;
 
 	private Device mDevice;
+	private OutputChannel mOutputChannel;
 	private AccelerometersSensor mAccSensor;
 	private MagnetometersSensor mMagSensor;
 	private RotationSensor mRotSensor;
@@ -63,8 +65,10 @@ public class MainActivity extends Activity {
 
 		mDevice = new Device("android");
 		mChannelResponse = new ChannelResponseCallback();
-		mDevice.setOutputChannel(new SocketOutputChannel(SERVER_IP,
-				SERVER_PORT, mChannelResponse));
+
+		mOutputChannel = new SocketOutputChannel(SERVER_IP, SERVER_PORT);
+		mOutputChannel.setCallback(mChannelResponse);
+		mDevice.setOutputChannel(mOutputChannel);
 		mDevice.startSending();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
@@ -98,6 +102,16 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+
+		mOutputChannel.setCallback(null);
+		mDevice.setOutputChannel(mOutputChannel);
+		ControlMessageUtils.disconnect();
+
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
 
 		mDevice.stopSending();
 	}
@@ -211,9 +225,9 @@ public class MainActivity extends Activity {
 					msg.obj = data.getError();
 					mMsgHandler.sendMessage(msg);
 				}
-			} else if(data.getMsgType() == Frame.MSG_TYPE_GIVEUPCONTROL) {
-				FragmentTransactionHelper.transTo(MainActivity.this, new SlaveryFragment(),
-						"slaveryFragment", false);
+			} else if (data.getMsgType() == Frame.MSG_TYPE_GIVEUPCONTROL) {
+				FragmentTransactionHelper.transTo(MainActivity.this,
+						new SlaveryFragment(), "slaveryFragment", false);
 			}
 		}
 
