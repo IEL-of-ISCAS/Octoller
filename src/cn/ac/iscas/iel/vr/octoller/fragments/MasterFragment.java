@@ -19,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
 import cn.ac.iscas.iel.vr.octoller.MainActivity;
 import cn.ac.iscas.iel.vr.octoller.PickingActivity;
@@ -42,6 +43,7 @@ public class MasterFragment extends Fragment {
 
 	protected ImageButton mBtnLock;
 	protected Button mBtnManiFlight;
+	protected Button mBtnDriver;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -106,6 +108,35 @@ public class MasterFragment extends Fragment {
 				case MotionEvent.ACTION_DOWN:
 					try {
 						mMainActivity.resumeSensor();
+						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_FLIGHTMANIPULATOR);
+						mMainActivity.getDevice().startSampling();
+					} catch (MultipleSampleThreadException e) {
+						e.printStackTrace();
+					}
+					break;
+
+				case MotionEvent.ACTION_UP:
+				case MotionEvent.ACTION_CANCEL:
+					mMainActivity.pauseSensor();
+					mMainActivity.getDevice().stopSampling();
+					break;
+				}
+				return true;
+			}
+		});
+		
+		mBtnDriver = (Button) view.findViewById(R.id.btn_mani_drive);
+		mBtnDriver.setOnTouchListener(new View.OnTouchListener() {
+
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				final int action = MotionEventCompat.getActionMasked(event);
+
+				switch (action) {
+				case MotionEvent.ACTION_DOWN:
+					try {
+						mMainActivity.resumeSensor();
+						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_DRIVERMANIPULATOR);
 						mMainActivity.getDevice().startSampling();
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
