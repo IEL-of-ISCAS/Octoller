@@ -1,5 +1,13 @@
 package cn.ac.iscas.iel.vr.octoller;
 
+import android.app.Activity;
+import android.app.Service;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
+import android.os.Bundle;
+import android.view.Menu;
 import cn.ac.iscas.iel.csdtp.channel.SocketOutputChannel;
 import cn.ac.iscas.iel.csdtp.controller.AccelerometersSensor;
 import cn.ac.iscas.iel.csdtp.controller.Device;
@@ -7,47 +15,31 @@ import cn.ac.iscas.iel.csdtp.controller.MagnetometersSensor;
 import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
 import cn.ac.iscas.iel.csdtp.data.SensorData;
 import cn.ac.iscas.iel.csdtp.exception.ChangeSensorWhileCollectingDataException;
-import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
-import android.app.Activity;
-import android.app.Service;
-import android.content.Intent;
-import android.hardware.Sensor;
-import android.hardware.SensorEvent;
-import android.hardware.SensorEventListener;
-import android.hardware.SensorManager;
-import android.os.Bundle;
-import android.support.v4.view.MotionEventCompat;
-import android.view.Menu;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
+import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
+import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 
-public class MainActivity extends Activity implements SensorEventListener {
+public class MainActivity extends Activity {
 
 	private static final String SERVER_IP = "10.0.0.96";
 	private static final int SERVER_PORT = 6666;
-	
+
 	private Device mDevice;
 	private AccelerometersSensor mAccSensor;
 	private MagnetometersSensor mMagSensor;
 	private RotationSensor mRotSensor;
-	
+
 	private SensorManager mSensorManager;
 	private Sensor mPhyAccSensor;
 	private Sensor mPhyMagSensor;
 	private Sensor mPhyRotSensor;
 
-	protected ImageButton mBtnLock;
-	protected Button mBtnManiFlight;
+	private MainSensorListener mSensorListener;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
-		setupViews();
-		
 		mDevice = new Device("android");
 		mDevice.setOutputChannel(new SocketOutputChannel(SERVER_IP, SERVER_PORT));
 
@@ -62,7 +54,7 @@ public class MainActivity extends Activity implements SensorEventListener {
 		mAccSensor = new AccelerometersSensor();
 		mMagSensor = new MagnetometersSensor();
 		mRotSensor = new RotationSensor();
-		
+
 		try {
 			mDevice.registerSensor(mAccSensor);
 			mDevice.registerSensor(mMagSensor);
@@ -70,35 +62,14 @@ public class MainActivity extends Activity implements SensorEventListener {
 		} catch (ChangeSensorWhileCollectingDataException e) {
 			e.printStackTrace();
 		}
-	}
-	
-	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+
+		mSensorListener = new MainSensorListener();
+		
+		FragmentTransactionHelper.transTo(this, new WelcomeFragment(), "welcomeFragment", true);
 	}
 
-	@Override
-	public void onSensorChanged(SensorEvent event) {
-		SensorData<float[]> data = new SensorData<float[]>(event.values);
-		if (event.sensor == mPhyAccSensor) {
-			mAccSensor.updateSnapshot(data);
-		} else if (event.sensor == mPhyMagSensor) {
-			mMagSensor.updateSnapshot(data);
-		} else if (event.sensor == mPhyRotSensor) {
-			mRotSensor.updateSnapshot(data);
-		}
-	}
-	
-	private void pauseSensor() {
-		mSensorManager.unregisterListener(this);
-	}
-
-	private void resumeSensor() {
-		mSensorManager.registerListener(this, mPhyAccSensor,
-				SensorManager.SENSOR_DELAY_NORMAL);
-		mSensorManager.registerListener(this, mPhyMagSensor,
-				SensorManager.SENSOR_DELAY_NORMAL);
-		mSensorManager.registerListener(this, mPhyRotSensor,
-				SensorManager.SENSOR_DELAY_NORMAL);
+	public Device getDevice() {
+		return mDevice;
 	}
 
 	@Override
@@ -107,67 +78,61 @@ public class MainActivity extends Activity implements SensorEventListener {
 		return true;
 	}
 
-	protected void setupViews() {
-		mBtnLock = (ImageButton) findViewById(R.id.btn_lock_view);
-		mBtnLock.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				Intent gotoPickIntent = new Intent(MainActivity.this,
-						PickingActivity.class);
-				MainActivity.this.startActivity(gotoPickIntent);
-			}
-		});
-
-		mBtnManiFlight = (Button) findViewById(R.id.btn_mani_flight);
-		mBtnManiFlight.setOnTouchListener(new View.OnTouchListener() {
-
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				final int action = MotionEventCompat.getActionMasked(event);
-
-				switch (action) {
-				case MotionEvent.ACTION_DOWN:
-					try {
-						resumeSensor();
-						mDevice.startSampling();
-					} catch (MultipleSampleThreadException e) {
-						e.printStackTrace();
-					}
-					break;
-
-				case MotionEvent.ACTION_UP:
-				case MotionEvent.ACTION_CANCEL:
-					pauseSensor();
-					mDevice.stopSampling();
-					mDevice.stopSending();
-					break;
-				}
-				return true;
-			}
-		});
-	}
-	
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-
-		mDevice.stopSending();
-	}
-
 	@Override
 	protected void onPause() {
 		super.onPause();
-
 		pauseSensor();
-		mDevice.stopSampling();
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-
 		resumeSensor();
+	}
+
+	public void resumeSensor() {
+		mSensorManager.registerListener(mSensorListener, mPhyAccSensor,
+				SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(mSensorListener, mPhyMagSensor,
+				SensorManager.SENSOR_DELAY_NORMAL);
+		mSensorManager.registerListener(mSensorListener, mPhyRotSensor,
+				SensorManager.SENSOR_DELAY_NORMAL);
+	}
+
+	public void pauseSensor() {
+		mSensorManager.unregisterListener(mSensorListener);
+	}
+
+	/**
+	 * Implements the sensor listener to update sensor data
+	 * 
+	 * 
+	 * @Project Octoller
+	 * @Package cn.ac.iscas.iel.vr.octoller
+	 * @Class MainSensorListener
+	 * @Date May 6, 2013 9:33:29 AM
+	 * @author voidmain
+	 * @version
+	 * @since
+	 */
+	protected class MainSensorListener implements SensorEventListener {
+
+		@Override
+		public void onAccuracyChanged(Sensor sensor, int accuracy) {
+			// Don't care
+		}
+
+		@Override
+		public void onSensorChanged(SensorEvent event) {
+			SensorData<float[]> data = new SensorData<float[]>(event.values);
+			if (event.sensor == mPhyAccSensor) {
+				mAccSensor.updateSnapshot(data);
+			} else if (event.sensor == mPhyMagSensor) {
+				mMagSensor.updateSnapshot(data);
+			} else if (event.sensor == mPhyRotSensor) {
+				mRotSensor.updateSnapshot(data);
+			}
+		}
 	}
 
 }
