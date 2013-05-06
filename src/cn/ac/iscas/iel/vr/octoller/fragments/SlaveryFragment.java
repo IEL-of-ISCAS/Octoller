@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import cn.ac.iscas.iel.vr.octoller.R;
-import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
+import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 
 /**
  * Servant's fragment, functionality to be determined
@@ -67,13 +67,10 @@ public class SlaveryFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_disconnect:
-			// send network request?
-			FragmentTransactionHelper.transTo(this, new WelcomeFragment(),
-					"welcomeFragment", false);
+			ControlMessageUtils.disconnect();
 			return true;
 		case R.id.action_request_master:
-			FragmentTransactionHelper.transTo(this, new MasterFragment(),
-					"masterFragment", true);
+			ControlMessageUtils.requestControl();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

@@ -23,7 +23,7 @@ import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
 import cn.ac.iscas.iel.vr.octoller.MainActivity;
 import cn.ac.iscas.iel.vr.octoller.PickingActivity;
 import cn.ac.iscas.iel.vr.octoller.R;
-import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
+import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 
 /**
  * The master controller's fragment
@@ -132,13 +132,10 @@ public class MasterFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_disconnect:
-			// send network request?
-			FragmentTransactionHelper.transTo(this, new WelcomeFragment(),
-					"welcomeFragment", false);
+			ControlMessageUtils.disconnect();
 			return true;
 		case R.id.action_release_master:
-			FragmentTransactionHelper.transTo(this, new SlaveryFragment(),
-					"slaveryFragment", false);
+			ControlMessageUtils.releaseControl();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

@@ -1,5 +1,6 @@
 package cn.ac.iscas.iel.vr.octoller;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
@@ -8,7 +9,8 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
+import android.os.Handler;
+import android.os.Message;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -22,8 +24,10 @@ import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.data.ResponseData;
 import cn.ac.iscas.iel.csdtp.data.SensorData;
 import cn.ac.iscas.iel.csdtp.exception.ChangeSensorWhileCollectingDataException;
+import cn.ac.iscas.iel.vr.octoller.fragments.MasterFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.SlaveryFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
+import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 
 public class MainActivity extends Activity {
@@ -44,14 +48,23 @@ public class MainActivity extends Activity {
 	private MainSensorListener mSensorListener;
 	private ChannelResponseCallback mChannelResponse;
 
+	private Handler mMsgHandler;
+
+	private static final int MSG_CONNECT_ERROR = 0;
+	private static final int MSG_REQUEST_ERROR = 1;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 
+		// setup helper class
+		ControlMessageUtils.setActivty(this);
+
 		mDevice = new Device("android");
 		mChannelResponse = new ChannelResponseCallback();
-		mDevice.setOutputChannel(new SocketOutputChannel(SERVER_IP, SERVER_PORT, mChannelResponse));
+		mDevice.setOutputChannel(new SocketOutputChannel(SERVER_IP,
+				SERVER_PORT, mChannelResponse));
 		mDevice.startSending();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
@@ -78,12 +91,14 @@ public class MainActivity extends Activity {
 
 		FragmentTransactionHelper.transTo(this, new WelcomeFragment(),
 				"welcomeFragment", true);
+
+		mMsgHandler = new ChannelMessageHandler();
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		
+
 		mDevice.stopSending();
 	}
 
@@ -166,23 +181,53 @@ public class MainActivity extends Activity {
 			}
 		}
 	}
-	
+
 	protected class ChannelResponseCallback implements IChannelCallback {
 
 		@Override
 		public void onResponse(ResponseData data) {
-			if(data.getMsgType() == Frame.MSG_TYPE_NEWCONNECT) {
-				if(data.getStatus() == Frame.STATUS_SUCCESS) {
-					FragmentTransactionHelper.transTo(MainActivity.this, new SlaveryFragment(),
-							"slaveryFragment", true);
+			if (data.getMsgType() == Frame.MSG_TYPE_NEWCONNECT) {
+				if (data.getStatus() == Frame.STATUS_SUCCESS) {
+					FragmentTransactionHelper.transTo(MainActivity.this,
+							new SlaveryFragment(), "slaveryFragment", true);
 				} else {
-					Toast.makeText(MainActivity.this, data.getErrorMsg(), Toast.LENGTH_LONG).show();
+					Message msg = new Message();
+					msg.what = MSG_CONNECT_ERROR;
+					msg.arg1 = data.getMsgType();
+					msg.obj = data.getError();
+					mMsgHandler.sendMessage(msg);
 				}
+			} else if (data.getMsgType() == Frame.MSG_TYPE_DISCONNECT) {
+				FragmentTransactionHelper.transTo(MainActivity.this,
+						new WelcomeFragment(), "welcomeFragment", false);
+			} else if (data.getMsgType() == Frame.MSG_TYPE_REQUESTCONTROL) {
+				if (data.getStatus() == Frame.STATUS_SUCCESS) {
+					FragmentTransactionHelper.transTo(MainActivity.this,
+							new MasterFragment(), "masterFragment", true);
+				} else {
+					Message msg = new Message();
+					msg.what = MSG_REQUEST_ERROR;
+					msg.arg1 = data.getMsgType();
+					msg.obj = data.getError();
+					mMsgHandler.sendMessage(msg);
+				}
+			} else if(data.getMsgType() == Frame.MSG_TYPE_GIVEUPCONTROL) {
+				FragmentTransactionHelper.transTo(MainActivity.this, new SlaveryFragment(),
+						"slaveryFragment", false);
 			}
-			
-			Log.d("ChannelResponseCallback", data.getMsgType() + "  " + data.getStatus() + "  " + data.getErrorMsg());
 		}
-		
+
+	}
+
+	@SuppressLint("HandlerLeak")
+	protected class ChannelMessageHandler extends Handler {
+
+		@Override
+		public void handleMessage(Message msg) {
+			Toast.makeText(getApplicationContext(), msg.obj.toString(),
+					Toast.LENGTH_LONG).show();
+		}
+
 	}
 
 }
