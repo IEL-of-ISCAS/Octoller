@@ -47,13 +47,7 @@ public class MainActivity extends Activity {
 	private SensorManager mSensorManager;
 	private Sensor mPhyAccSensor;
 	private Sensor mPhyMagSensor;
-	private Sensor mPhyGyroSensor;
-
-	// Used to calc rotation vector
-	private static final float EPSILON = 0.0001f;
-	private static final float NS2S = 1.0f / 1000000000.0f;
-	private final float[] mDeltaRotationVector = new float[4];
-	private float mTimestamp;
+	private Sensor mPhyRotSensor;
 
 	private MainSensorListener mSensorListener;
 	private ChannelResponseCallback mChannelResponse;
@@ -84,7 +78,8 @@ public class MainActivity extends Activity {
 				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
 		mPhyMagSensor = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
-		mPhyGyroSensor = mSensorManager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
+		mPhyRotSensor = mSensorManager
+				.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
 		mAccSensor = new AccelerometersSensor();
 		mMagSensor = new MagnetometersSensor();
@@ -163,7 +158,7 @@ public class MainActivity extends Activity {
 				SensorManager.SENSOR_DELAY_GAME);
 		mSensorManager.registerListener(mSensorListener, mPhyMagSensor,
 				SensorManager.SENSOR_DELAY_GAME);
-		mSensorManager.registerListener(mSensorListener, mPhyGyroSensor,
+		mSensorManager.registerListener(mSensorListener, mPhyRotSensor,
 				SensorManager.SENSOR_DELAY_GAME);
 	}
 
@@ -198,35 +193,12 @@ public class MainActivity extends Activity {
 				mAccSensor.updateSnapshot(data);
 			} else if (event.sensor == mPhyMagSensor) {
 				mMagSensor.updateSnapshot(data);
-			} else if (event.sensor == mPhyGyroSensor) {
-				if (mTimestamp != 0) {
-					final float dT = (event.timestamp - mTimestamp) * NS2S;
-					float axisX = event.values[0];
-					float axisY = event.values[1];
-					float axisZ = event.values[2];
-
-					float omegaMagnitude = (float) Math.sqrt(axisX * axisX
-							+ axisY * axisY + axisZ * axisZ);
-
-					if (omegaMagnitude > EPSILON) {
-						axisX /= omegaMagnitude;
-						axisY /= omegaMagnitude;
-						axisZ /= omegaMagnitude;
-					}
-
-					float thetaOverTwo = omegaMagnitude * dT / 2.0f;
-					float sinThetaOverTwo = (float) Math.sin(thetaOverTwo);
-					float cosThetaOverTwo = (float) Math.cos(thetaOverTwo);
-					mDeltaRotationVector[0] = sinThetaOverTwo * axisX;
-					mDeltaRotationVector[1] = sinThetaOverTwo * axisY;
-					mDeltaRotationVector[2] = sinThetaOverTwo * axisZ;
-					mDeltaRotationVector[3] = cosThetaOverTwo;
-
-					data = new SensorData<float[]>(Arrays.copyOf(
-							mDeltaRotationVector, mDeltaRotationVector.length));
-					mRotSensor.updateSnapshot(data);
-				}
-				mTimestamp = event.timestamp;
+			} else if (event.sensor == mPhyRotSensor) {
+				float[] quaternion = new float[4];
+				SensorManager.getQuaternionFromVector(quaternion, event.values);
+				data = new SensorData<float[]>(Arrays.copyOf(quaternion,
+						quaternion.length));
+				mRotSensor.updateSnapshot(data);
 			}
 		}
 	}
