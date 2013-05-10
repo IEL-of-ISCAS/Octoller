@@ -7,7 +7,6 @@
 package cn.ac.iscas.iel.vr.octoller.fragments;
 
 import android.app.Fragment;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
 import android.view.LayoutInflater;
@@ -19,12 +18,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
-import cn.ac.iscas.iel.csdtp.data.Frame;
-import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
 import cn.ac.iscas.iel.vr.octoller.MainActivity;
-import cn.ac.iscas.iel.vr.octoller.PickingActivity;
 import cn.ac.iscas.iel.vr.octoller.R;
-import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
+import cn.ac.iscas.iel.vr.octoller.connection.BluetoothCommandService;
+import cn.ac.iscas.iel.vr.octoller.constants.Messages;
 
 /**
  * The master controller's fragment
@@ -38,8 +35,8 @@ import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
  * @since
  */
 public class MasterFragment extends Fragment {
-
 	protected MainActivity mMainActivity;
+	protected BluetoothCommandService mBluetoothService;
 
 	protected ImageButton mBtnLock;
 	protected Button mBtnManiFlight;
@@ -63,6 +60,7 @@ public class MasterFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 
 		mMainActivity = (MainActivity) this.getActivity();
+		mBluetoothService = mMainActivity.getBluetoothService();
 		setupViews(this.getView());
 	}
 
@@ -90,10 +88,6 @@ public class MasterFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
-				// TODO change to fragment
-				Intent gotoPickIntent = new Intent(mMainActivity,
-						PickingActivity.class);
-				mMainActivity.startActivity(gotoPickIntent);
 			}
 		});
 
@@ -106,25 +100,20 @@ public class MasterFragment extends Fragment {
 
 				switch (action) {
 				case MotionEvent.ACTION_DOWN:
-					try {
-						mMainActivity.resumeSensor();
-						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_FLIGHTMANIPULATOR);
-						mMainActivity.getDevice().startSampling();
-					} catch (MultipleSampleThreadException e) {
-						e.printStackTrace();
-					}
+					mMainActivity.setCurrentMsg(Messages.FLIGHTMANIPULATOR);
+					mMainActivity.setIsSendRotData(true);
 					break;
 
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
-					mMainActivity.pauseSensor();
-					mMainActivity.getDevice().stopSampling();
+					mBluetoothService.write(("{\"phoneID\":" + mMainActivity.getPhoneID() + ",\"msgType\":20,\"rotation\":}\n").getBytes());
+					mMainActivity.setIsSendRotData(false);
 					break;
 				}
 				return true;
 			}
 		});
-		
+
 		mBtnDriver = (Button) view.findViewById(R.id.btn_mani_drive);
 		mBtnDriver.setOnTouchListener(new View.OnTouchListener() {
 
@@ -134,19 +123,14 @@ public class MasterFragment extends Fragment {
 
 				switch (action) {
 				case MotionEvent.ACTION_DOWN:
-					try {
-						mMainActivity.resumeSensor();
-						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_DRIVERMANIPULATOR);
-						mMainActivity.getDevice().startSampling();
-					} catch (MultipleSampleThreadException e) {
-						e.printStackTrace();
-					}
+					mMainActivity.setCurrentMsg(Messages.DRIVEMANIPULATOR);
+					mMainActivity.setIsSendRotData(true);
 					break;
 
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
-					mMainActivity.pauseSensor();
-					mMainActivity.getDevice().stopSampling();
+					mBluetoothService.write(("{\"phoneID\":" + mMainActivity.getPhoneID() + ",\"msgType\":20,\"rotation\":}\n").getBytes());
+					mMainActivity.setIsSendRotData(false);
 					break;
 				}
 				return true;
@@ -163,10 +147,8 @@ public class MasterFragment extends Fragment {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.action_disconnect:
-			ControlMessageUtils.disconnect();
 			return true;
 		case R.id.action_release_master:
-			ControlMessageUtils.releaseControl();
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);

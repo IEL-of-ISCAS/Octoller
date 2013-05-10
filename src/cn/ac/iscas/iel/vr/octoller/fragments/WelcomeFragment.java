@@ -18,7 +18,6 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import cn.ac.iscas.iel.vr.octoller.R;
-import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 
 /**
  * The fragment that display the welcome page
@@ -32,7 +31,7 @@ import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
  * @since
  */
 public class WelcomeFragment extends Fragment {
-	
+
 	protected ImageView mIvOctopus;
 
 	@Override
@@ -45,7 +44,8 @@ public class WelcomeFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_welcome, container, false);
+		View view = inflater.inflate(R.layout.fragment_welcome, container,
+				false);
 		mIvOctopus = (ImageView) view.findViewById(R.id.iv_octopus);
 		return view;
 	}
@@ -53,7 +53,7 @@ public class WelcomeFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-		
+
 		mIvOctopus.clearAnimation();
 	}
 
@@ -75,10 +75,10 @@ public class WelcomeFragment extends Fragment {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.action_connect:
-			ControlMessageUtils.connect();
-			
-			Animation animation = AnimationUtils.loadAnimation(getActivity(), R.anim.loading);
+		case R.id.action_connect_bluetooth:
+		case R.id.action_connect_wifi:
+			Animation animation = AnimationUtils.loadAnimation(getActivity(),
+					R.anim.loading);
 			mIvOctopus.startAnimation(animation);
 
 			return true;

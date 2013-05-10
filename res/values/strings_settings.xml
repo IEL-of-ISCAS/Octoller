@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="title_activity_settings">设置</string>
+    <string name="category_bluetooth">蓝牙设置</string>
+    <string name="category_wifi">WIFI设置</string>
+    <string name="pref_wifi_server_ip">设置服务器IP地址</string>
+    <string name="pref_bt_choose_pair_device">选择已配对设备</string>
+    <string name="pref_bt_discover_new_device">发现新设备</string>
+    <string name="bt_not_enabled_leaving">蓝牙打开失败</string>
+    <string name="presf_key_wifi_server_ip">KEY_WIFI_SERVER_IP</string>
+    <string name="prefs_key_bt_target_device">KEY_BT_TARGET_DEVICE</string>
+
+</resources>

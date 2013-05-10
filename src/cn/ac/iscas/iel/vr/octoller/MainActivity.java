@@ -1,11 +1,14 @@
 package cn.ac.iscas.iel.vr.octoller;
 
-import java.util.Arrays;
+import java.util.UUID;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Service;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothDevice;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,36 +16,24 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-import cn.ac.iscas.iel.csdtp.channel.IChannelCallback;
-import cn.ac.iscas.iel.csdtp.channel.OutputChannel;
-import cn.ac.iscas.iel.csdtp.channel.SocketOutputChannel;
-import cn.ac.iscas.iel.csdtp.controller.AccelerometersSensor;
-import cn.ac.iscas.iel.csdtp.controller.Device;
-import cn.ac.iscas.iel.csdtp.controller.MagnetometersSensor;
-import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
-import cn.ac.iscas.iel.csdtp.data.Frame;
-import cn.ac.iscas.iel.csdtp.data.ResponseData;
-import cn.ac.iscas.iel.csdtp.data.SensorData;
-import cn.ac.iscas.iel.csdtp.exception.ChangeSensorWhileCollectingDataException;
+import cn.ac.iscas.iel.vr.octoller.connection.BluetoothCommandService;
+import cn.ac.iscas.iel.vr.octoller.constants.BTConstants;
+import cn.ac.iscas.iel.vr.octoller.constants.Messages;
 import cn.ac.iscas.iel.vr.octoller.fragments.MasterFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.SlaveryFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
-import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 
+@SuppressLint("HandlerLeak")
 public class MainActivity extends Activity {
 
-	private static final String SERVER_IP = "10.0.0.96";
-	private static final int SERVER_PORT = 6666;
-
-	private Device mDevice;
-	private OutputChannel mOutputChannel;
-	private AccelerometersSensor mAccSensor;
-	private MagnetometersSensor mMagSensor;
-	private RotationSensor mRotSensor;
+	// Intent request codes
+	private static final int REQUEST_ENABLE_BT = 1001;
 
 	private SensorManager mSensorManager;
 	private Sensor mPhyAccSensor;
@@ -50,28 +41,53 @@ public class MainActivity extends Activity {
 	private Sensor mPhyRotSensor;
 
 	private MainSensorListener mSensorListener;
-	private ChannelResponseCallback mChannelResponse;
 
-	private Handler mMsgHandler;
+	private static final String phoneID = UUID.randomUUID().toString();
 
-	private static final int MSG_CONNECT_ERROR = 0;
-	private static final int MSG_REQUEST_ERROR = 1;
+	private boolean mIsSendRotData;
+	private boolean mIsConnect;
+	private boolean mIsControl;
+	private int mCurrentMsg;
+	
+	private float[] mQuaternion = new float[4];
+	private boolean mDrop;
+	
+	public void setCurrentMsg(int msg) {
+		mCurrentMsg = msg;
+	}
+	
+	public int getCurrentMsg() {
+		return mCurrentMsg;
+	}
+
+	public boolean isSendRotData() {
+		return mIsSendRotData;
+	}
+
+	public void setIsSendRotData(boolean isSendRotData) {
+		this.mIsSendRotData = isSendRotData;
+	}
+
+	public String getPhoneID() {
+		return phoneID;
+	}
+
+	private String mConnectedDeviceName = null;
+	private BluetoothAdapter mBluetoothAdapter = null;
+	private BluetoothCommandService mCommandService = null;
+
+	public BluetoothCommandService getBluetoothService() {
+		return mCommandService;
+	}
+
+	public void setBluetoothService(BluetoothCommandService service) {
+		mCommandService = service;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		// setup helper class
-		ControlMessageUtils.setActivty(this);
-
-		mDevice = new Device("android");
-		mChannelResponse = new ChannelResponseCallback();
-
-		mOutputChannel = new SocketOutputChannel(SERVER_IP, SERVER_PORT);
-		mOutputChannel.setCallback(mChannelResponse);
-		mDevice.setOutputChannel(mOutputChannel);
-		mDevice.startSending();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
 		mPhyAccSensor = mSensorManager
@@ -81,45 +97,15 @@ public class MainActivity extends Activity {
 		mPhyRotSensor = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
-		mAccSensor = new AccelerometersSensor();
-		mMagSensor = new MagnetometersSensor();
-		mRotSensor = new RotationSensor();
-
-		try {
-			mDevice.registerSensor(mAccSensor);
-			mDevice.registerSensor(mMagSensor);
-			mDevice.registerSensor(mRotSensor);
-		} catch (ChangeSensorWhileCollectingDataException e) {
-			e.printStackTrace();
-		}
+		mIsSendRotData = false;
+		mIsConnect = false;
+		mIsControl = false;
+		mDrop = false;
 
 		mSensorListener = new MainSensorListener();
 
 		FragmentTransactionHelper.transTo(this, new WelcomeFragment(),
 				"welcomeFragment", true);
-
-		mMsgHandler = new ChannelMessageHandler();
-	}
-
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
-
-		mOutputChannel.setCallback(null);
-		mDevice.setOutputChannel(mOutputChannel);
-		ControlMessageUtils.disconnect();
-
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		mDevice.stopSending();
-	}
-
-	public Device getDevice() {
-		return mDevice;
 	}
 
 	@Override
@@ -135,6 +121,45 @@ public class MainActivity extends Activity {
 			Intent settingsIntent = new Intent(MainActivity.this,
 					SettingsActivity.class);
 			MainActivity.this.startActivity(settingsIntent);
+			return true;
+
+		case R.id.action_connect_bluetooth:
+			mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
+
+			if (mBluetoothAdapter == null) {
+				Toast.makeText(this, R.string.error_bluetooth_not_supported,
+						Toast.LENGTH_LONG).show();
+				return true;
+			}
+
+			if (!mBluetoothAdapter.isEnabled()) {
+				Intent enableIntent = new Intent(
+						BluetoothAdapter.ACTION_REQUEST_ENABLE);
+				startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
+			} else {
+				if (mCommandService == null) {
+					setupCommand();
+				}
+			}
+
+			return false;
+		case R.id.action_connect_wifi:
+			// TODO
+			return false;
+		case R.id.action_disconnect:
+			mCommandService
+					.write(("{\"phoneID\":\"" + phoneID + "\",\"msgType\":2}\n")
+							.getBytes());
+			return false;
+		case R.id.action_request_master:
+			mCommandService
+					.write(("{\"phoneID\":\"" + phoneID + "\",\"msgType\":4}\n")
+							.getBytes());
+			return false;
+		case R.id.action_release_master:
+			mCommandService
+					.write(("{\"phoneID\":\"" + phoneID + "\",\"msgType\":3}\n")
+							.getBytes());
 			return true;
 		default:
 			return super.onOptionsItemSelected(item);
@@ -153,6 +178,18 @@ public class MainActivity extends Activity {
 		resumeSensor();
 	}
 
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+
+		mCommandService
+				.write(("{\"phoneID\":\"" + phoneID + "\",\"msgType\":2}\n")
+						.getBytes());
+
+		if (mCommandService != null)
+			mCommandService.stop();
+	}
+
 	public void resumeSensor() {
 		mSensorManager.registerListener(mSensorListener, mPhyAccSensor,
 				SensorManager.SENSOR_DELAY_GAME);
@@ -164,6 +201,26 @@ public class MainActivity extends Activity {
 
 	public void pauseSensor() {
 		mSensorManager.unregisterListener(mSensorListener);
+	}
+
+	private void setupCommand() {
+		mCommandService = new BluetoothCommandService(this, mHandler);
+
+		SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		String address = prefs.getString(
+				getString(R.string.prefs_key_bt_target_device), "");
+		if (TextUtils.isEmpty(address)) {
+			// Need to choose the paired device
+			Toast.makeText(this,
+					R.string.error_bluetooth_target_device_not_set,
+					Toast.LENGTH_SHORT).show();
+			Intent settingsIntent = new Intent(this, SettingsActivity.class);
+			startActivity(settingsIntent);
+		} else {
+			BluetoothDevice device = mBluetoothAdapter.getRemoteDevice(address);
+			mCommandService.connect(device);
+		}
 	}
 
 	/**
@@ -182,73 +239,145 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onAccuracyChanged(Sensor sensor, int accuracy) {
-			// Don't care
 		}
 
 		@Override
 		public void onSensorChanged(SensorEvent event) {
-			SensorData<float[]> data = new SensorData<float[]>(Arrays.copyOf(
-					event.values, event.values.length));
-			if (event.sensor == mPhyAccSensor) {
-				mAccSensor.updateSnapshot(data);
-			} else if (event.sensor == mPhyMagSensor) {
-				mMagSensor.updateSnapshot(data);
-			} else if (event.sensor == mPhyRotSensor) {
-				float[] quaternion = new float[4];
-				SensorManager.getQuaternionFromVector(quaternion, event.values);
-				data = new SensorData<float[]>(Arrays.copyOf(quaternion,
-						quaternion.length));
-				mRotSensor.updateSnapshot(data);
+			mDrop = !mDrop;
+			if(!mDrop) return;
+			if (mIsControl && mIsConnect && mIsSendRotData
+					&& event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+				StringBuffer stringBuffer = new StringBuffer("{\"phoneID\":\""
+						+ phoneID + "\",\"msgType\":" + mCurrentMsg + ",\"rotation\":[");
+				SensorManager
+						.getQuaternionFromVector(mQuaternion, event.values);
+
+				stringBuffer.append(mQuaternion[0] + "," + mQuaternion[1] + ","
+						+ mQuaternion[2] + "," + mQuaternion[3] + "]}\n");
+
+				mCommandService.write(String.valueOf(stringBuffer).getBytes());
+			} else if (mIsConnect) {
+				StringBuffer stringBuffer = new StringBuffer("{\"phoneID\":\""
+						+ phoneID + "\",\"msgType\":22,\"rotation\":[");
+				SensorManager
+						.getQuaternionFromVector(mQuaternion, event.values);
+
+				stringBuffer.append(mQuaternion[0] + "," + mQuaternion[1] + ","
+						+ mQuaternion[2] + "," + mQuaternion[3] + "]}\n");
+
+				mCommandService.write(String.valueOf(stringBuffer).getBytes());
 			}
 		}
 	}
 
-	protected class ChannelResponseCallback implements IChannelCallback {
-
-		@Override
-		public void onResponse(ResponseData data) {
-			if (data.getMsgType() == Frame.MSG_TYPE_NEWCONNECT) {
-				if (data.getStatus() == Frame.STATUS_SUCCESS) {
-					FragmentTransactionHelper.transTo(MainActivity.this,
-							new SlaveryFragment(), "slaveryFragment", true);
-				} else {
-					Message msg = new Message();
-					msg.what = MSG_CONNECT_ERROR;
-					msg.arg1 = data.getMsgType();
-					msg.obj = data.getError();
-					mMsgHandler.sendMessage(msg);
-				}
-			} else if (data.getMsgType() == Frame.MSG_TYPE_DISCONNECT) {
-				FragmentTransactionHelper.transTo(MainActivity.this,
-						new WelcomeFragment(), "welcomeFragment", false);
-			} else if (data.getMsgType() == Frame.MSG_TYPE_REQUESTCONTROL) {
-				if (data.getStatus() == Frame.STATUS_SUCCESS) {
-					FragmentTransactionHelper.transTo(MainActivity.this,
-							new MasterFragment(), "masterFragment", true);
-				} else {
-					Message msg = new Message();
-					msg.what = MSG_REQUEST_ERROR;
-					msg.arg1 = data.getMsgType();
-					msg.obj = data.getError();
-					mMsgHandler.sendMessage(msg);
-				}
-			} else if (data.getMsgType() == Frame.MSG_TYPE_GIVEUPCONTROL) {
-				FragmentTransactionHelper.transTo(MainActivity.this,
-						new SlaveryFragment(), "slaveryFragment", false);
-			}
-		}
-
-	}
-
-	@SuppressLint("HandlerLeak")
-	protected class ChannelMessageHandler extends Handler {
-
+	private final Handler mHandler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			Toast.makeText(getApplicationContext(), msg.obj.toString(),
-					Toast.LENGTH_LONG).show();
-		}
+			switch (msg.what) {
+			case BTConstants.MESSAGE_STATE_CHANGE:
+				switch (msg.arg1) {
+				case BluetoothCommandService.STATE_CONNECTED:
+					// send newconnect message to server
+					mCommandService
+							.write(("{\"phoneID\":\"" + phoneID + "\",\"msgType\":1}\n")
+									.getBytes());
+					break;
+				case BluetoothCommandService.STATE_CONNECTING:
+					break;
+				case BluetoothCommandService.STATE_LISTEN:
+				case BluetoothCommandService.STATE_NONE:
+					Toast.makeText(getApplication(),
+							R.string.error_bluetooth_not_connected,
+							Toast.LENGTH_SHORT).show();
+					break;
+				}
+				break;
+			case BTConstants.MESSAGE_DEVICE_NAME:
+				// save the connected device's name
+				mConnectedDeviceName = msg.getData().getString(
+						BTConstants.KEY_DEVICE_NAME);
+				Toast.makeText(getApplicationContext(),
+						"Connected to " + mConnectedDeviceName,
+						Toast.LENGTH_SHORT).show();
+				break;
+			case BTConstants.MESSAGE_TOAST:
+				Toast.makeText(getApplicationContext(),
+						msg.getData().getString(BTConstants.KEY_TOAST),
+						Toast.LENGTH_SHORT).show();
+				break;
+			case BTConstants.MESSAGE_READ:
+				switch (msg.arg1) {
+				case Messages.NEWCONNECT:
+					if (msg.arg2 == 1) {
+						FragmentTransactionHelper.transTo(MainActivity.this,
+								new SlaveryFragment(), "slaveryFragment", true);
+						Toast.makeText(getApplicationContext(), "连接成功",
+								Toast.LENGTH_SHORT).show();
+						mIsConnect = true;
+					} else {
+						Toast.makeText(getApplicationContext(), "连接失败",
+								Toast.LENGTH_SHORT).show();
+					}
+					break;
+				case Messages.DISCONNECT:
+					if (msg.arg2 == 1) {
+						Toast.makeText(getApplicationContext(), "断开成功",
+								Toast.LENGTH_SHORT).show();
+						if (!MainActivity.this.isFinishing()) {
+							FragmentTransactionHelper.transTo(
+									MainActivity.this, new WelcomeFragment(),
+									"welcomeFragment", true);
+							mIsConnect = false;
+						}
+					} else {
+						Toast.makeText(getApplicationContext(), "断开失败",
+								Toast.LENGTH_SHORT).show();
+					}
+					break;
+				case Messages.REQUESTCONTROL:
+					if (msg.arg2 == 1) {
+						FragmentTransactionHelper.transTo(MainActivity.this,
+								new MasterFragment(), "masterFragment", true);
+						Toast.makeText(getApplicationContext(), "申请控制成功:)",
+								Toast.LENGTH_SHORT).show();
+						mIsControl = true;
+					} else {
+						Toast.makeText(getApplicationContext(), "申请控制失败:(",
+								Toast.LENGTH_SHORT).show();
+					}
+					break;
+				case Messages.GIVEUPCONTROL:
+					if (msg.arg2 == 1) {
+						FragmentTransactionHelper.transTo(MainActivity.this,
+								new SlaveryFragment(), "slaveryFragment", true);
+						Toast.makeText(getApplicationContext(), "放弃控制成功:)",
+								Toast.LENGTH_SHORT).show();
+						mIsControl = false;
+					} else {
+						Toast.makeText(getApplicationContext(), "放弃控制失败:(",
+								Toast.LENGTH_SHORT).show();
+					}
+					break;
 
+				default:
+					break;
+				}
+				break;
+			}
+		}
+	};
+
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		switch (requestCode) {
+		case REQUEST_ENABLE_BT:
+			// When the request to enable Bluetooth returns
+			if (resultCode == Activity.RESULT_OK) {
+				setupCommand();
+			} else {
+				Toast.makeText(this, R.string.bt_not_enabled_leaving,
+						Toast.LENGTH_SHORT).show();
+			}
+		}
 	}
 
 }

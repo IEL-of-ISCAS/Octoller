@@ -17,6 +17,7 @@
         android:scaleType="centerInside" />
 
     <LinearLayout
+        android:id="@+id/linearLayout1"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_alignParentLeft="true"
@@ -52,7 +53,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/manipulator_ufo" />
-        
     </LinearLayout>
 
 </RelativeLayout>
