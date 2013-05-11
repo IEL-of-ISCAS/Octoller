@@ -50,7 +50,6 @@ public class MainActivity extends Activity {
 	private int mCurrentMsg;
 	
 	private float[] mQuaternion = new float[4];
-	private boolean mDrop;
 	
 	public void setCurrentMsg(int msg) {
 		mCurrentMsg = msg;
@@ -100,7 +99,6 @@ public class MainActivity extends Activity {
 		mIsSendRotData = false;
 		mIsConnect = false;
 		mIsControl = false;
-		mDrop = false;
 
 		mSensorListener = new MainSensorListener();
 
@@ -243,8 +241,6 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onSensorChanged(SensorEvent event) {
-			mDrop = !mDrop;
-			if(!mDrop) return;
 			if (mIsControl && mIsConnect && mIsSendRotData
 					&& event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
 				StringBuffer stringBuffer = new StringBuffer("{\"phoneID\":\""
