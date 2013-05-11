@@ -16,7 +16,7 @@
         android:text="@string/picking_hint_rotate" />
 
     <View
-        android:id="@+id/view1"
+        android:id="@+id/v_operation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/btn_model_rotate"

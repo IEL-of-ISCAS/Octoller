@@ -22,6 +22,7 @@ import cn.ac.iscas.iel.vr.octoller.MainActivity;
 import cn.ac.iscas.iel.vr.octoller.R;
 import cn.ac.iscas.iel.vr.octoller.connection.BluetoothCommandService;
 import cn.ac.iscas.iel.vr.octoller.constants.Messages;
+import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 
 /**
  * The master controller's fragment
@@ -88,6 +89,7 @@ public class MasterFragment extends Fragment {
 
 			@Override
 			public void onClick(View v) {
+				FragmentTransactionHelper.transTo(mMainActivity, new PickingFragment(), "pickingFragment", true);
 			}
 		});
 
@@ -106,7 +108,7 @@ public class MasterFragment extends Fragment {
 
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
-					mBluetoothService.write(("{\"phoneID\":" + mMainActivity.getPhoneID() + ",\"msgType\":20,\"rotation\":}\n").getBytes());
+					mBluetoothService.write(("{\"phoneID\":" + mMainActivity.getPhoneID() + ",\"msgType\":20}\n").getBytes());
 					mMainActivity.setIsSendRotData(false);
 					break;
 				}
@@ -129,7 +131,7 @@ public class MasterFragment extends Fragment {
 
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
-					mBluetoothService.write(("{\"phoneID\":" + mMainActivity.getPhoneID() + ",\"msgType\":20,\"rotation\":}\n").getBytes());
+					mBluetoothService.write(("{\"phoneID\":" + mMainActivity.getPhoneID() + ",\"msgType\":20}\n").getBytes());
 					mMainActivity.setIsSendRotData(false);
 					break;
 				}

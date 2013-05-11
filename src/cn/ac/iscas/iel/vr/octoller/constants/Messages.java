@@ -24,4 +24,6 @@ public class Messages {
 	public final static int ENDMANIPULATOR		= 20;
 	public final static int PICK				= 21;	  //拾取操作
 	public final static int PHONEMOVE			= 22;	  //连接后的缺省状态，主要是用来控制鼠标
+	public final static int ROTATE              = 24;     //锁定后旋转手机
+	public final static int PINCH               = 25;     //两指缩放
 }
