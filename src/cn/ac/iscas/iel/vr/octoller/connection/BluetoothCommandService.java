@@ -223,6 +223,7 @@ public class BluetoothCommandService {
 			r = mConnectedThread;
 		}
 		// Perform the write unsynchronized
+		Log.e("WRTIE", out.toString());
 		r.write(out);
 	}
 

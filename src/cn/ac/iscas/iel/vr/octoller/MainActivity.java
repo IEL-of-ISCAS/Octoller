@@ -47,14 +47,15 @@ public class MainActivity extends Activity {
 	private boolean mIsSendRotData;
 	private boolean mIsConnect;
 	private boolean mIsControl;
+	private boolean mIsLock;
 	private int mCurrentMsg;
-	
+
 	private float[] mQuaternion = new float[4];
-	
+
 	public void setCurrentMsg(int msg) {
 		mCurrentMsg = msg;
 	}
-	
+
 	public int getCurrentMsg() {
 		return mCurrentMsg;
 	}
@@ -65,6 +66,10 @@ public class MainActivity extends Activity {
 
 	public void setIsSendRotData(boolean isSendRotData) {
 		this.mIsSendRotData = isSendRotData;
+	}
+
+	public void setIsLock(boolean isLock) {
+		mIsLock = isLock;
 	}
 
 	public String getPhoneID() {
@@ -99,6 +104,7 @@ public class MainActivity extends Activity {
 		mIsSendRotData = false;
 		mIsConnect = false;
 		mIsControl = false;
+		mIsLock = false;
 
 		mSensorListener = new MainSensorListener();
 
@@ -241,27 +247,42 @@ public class MainActivity extends Activity {
 
 		@Override
 		public void onSensorChanged(SensorEvent event) {
-			if (mIsControl && mIsConnect && mIsSendRotData
-					&& event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-				StringBuffer stringBuffer = new StringBuffer("{\"phoneID\":\""
-						+ phoneID + "\",\"msgType\":" + mCurrentMsg + ",\"rotation\":[");
-				SensorManager
-						.getQuaternionFromVector(mQuaternion, event.values);
+			if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
+				if (mIsConnect) {
+					if (mIsSendRotData) {
+						if (mIsControl || mIsLock) {
+							StringBuffer stringBuffer = new StringBuffer(
+									"{\"phoneID\":\"" + phoneID
+											+ "\",\"msgType\":" + mCurrentMsg
+											+ ",\"rotation\":[");
+							SensorManager.getQuaternionFromVector(mQuaternion,
+									event.values);
 
-				stringBuffer.append(mQuaternion[0] + "," + mQuaternion[1] + ","
-						+ mQuaternion[2] + "," + mQuaternion[3] + "]}\n");
+							stringBuffer.append(mQuaternion[0] + ","
+									+ mQuaternion[1] + "," + mQuaternion[2]
+									+ "," + mQuaternion[3] + "]}\n");
 
-				mCommandService.write(String.valueOf(stringBuffer).getBytes());
-			} else if (mIsConnect) {
-				StringBuffer stringBuffer = new StringBuffer("{\"phoneID\":\""
-						+ phoneID + "\",\"msgType\":22,\"rotation\":[");
-				SensorManager
-						.getQuaternionFromVector(mQuaternion, event.values);
+							mCommandService.write(String.valueOf(stringBuffer)
+									.getBytes());
+						}
+					} else {
+						if (mIsControl) {
+							StringBuffer stringBuffer = new StringBuffer(
+									"{\"phoneID\":\""
+											+ phoneID
+											+ "\",\"msgType\":22,\"rotation\":[");
+							SensorManager.getQuaternionFromVector(mQuaternion,
+									event.values);
 
-				stringBuffer.append(mQuaternion[0] + "," + mQuaternion[1] + ","
-						+ mQuaternion[2] + "," + mQuaternion[3] + "]}\n");
+							stringBuffer.append(mQuaternion[0] + ","
+									+ mQuaternion[1] + "," + mQuaternion[2]
+									+ "," + mQuaternion[3] + "]}\n");
 
-				mCommandService.write(String.valueOf(stringBuffer).getBytes());
+							mCommandService.write(String.valueOf(stringBuffer)
+									.getBytes());
+						}
+					}
+				}
 			}
 		}
 	}

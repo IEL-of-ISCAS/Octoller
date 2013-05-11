@@ -86,11 +86,15 @@ public class PickingFragment extends Fragment implements OnGestureListener,
 	@Override
 	public void onResume() {
 		super.onResume();
+		
+		mMainActivity.setIsLock(true);
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+		
+		mMainActivity.setIsLock(false);
 	}
 
 	private void setupViews(View view) {
@@ -204,14 +208,11 @@ public class PickingFragment extends Fragment implements OnGestureListener,
 	@Override
 	public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX,
 			float velocityY) {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 
 	@Override
 	public void onLongPress(MotionEvent e) {
-		// TODO Auto-generated method stub
-
 	}
 
 	@Override
