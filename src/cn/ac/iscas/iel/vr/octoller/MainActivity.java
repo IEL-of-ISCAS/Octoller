@@ -17,8 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import cn.ac.iscas.iel.csdtp.channel.IChannelCallback;
-import cn.ac.iscas.iel.csdtp.channel.OutputChannel;
-import cn.ac.iscas.iel.csdtp.channel.SocketOutputChannel;
 import cn.ac.iscas.iel.csdtp.controller.AccelerometersSensor;
 import cn.ac.iscas.iel.csdtp.controller.Device;
 import cn.ac.iscas.iel.csdtp.controller.MagnetometersSensor;
@@ -34,12 +32,7 @@ import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 
 public class MainActivity extends Activity {
-
-	private static final String SERVER_IP = "10.0.0.96";
-	private static final int SERVER_PORT = 6666;
-
 	private Device mDevice;
-	private OutputChannel mOutputChannel;
 	private AccelerometersSensor mAccSensor;
 	private MagnetometersSensor mMagSensor;
 	private RotationSensor mRotSensor;
@@ -54,9 +47,6 @@ public class MainActivity extends Activity {
 
 	private Handler mMsgHandler;
 
-	private static final int MSG_CONNECT_ERROR = 0;
-	private static final int MSG_REQUEST_ERROR = 1;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -67,11 +57,6 @@ public class MainActivity extends Activity {
 
 		mDevice = new Device("android");
 		mChannelResponse = new ChannelResponseCallback();
-
-		mOutputChannel = new SocketOutputChannel(SERVER_IP, SERVER_PORT);
-		mOutputChannel.setCallback(mChannelResponse);
-		mDevice.setOutputChannel(mOutputChannel);
-		mDevice.startSending();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
 		mPhyAccSensor = mSensorManager
@@ -105,8 +90,7 @@ public class MainActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 
-		mOutputChannel.setCallback(null);
-		mDevice.setOutputChannel(mOutputChannel);
+		mDevice.setOutputChannel(null);
 		ControlMessageUtils.disconnect();
 
 		try {
@@ -120,6 +104,10 @@ public class MainActivity extends Activity {
 
 	public Device getDevice() {
 		return mDevice;
+	}
+	
+	public IChannelCallback getCallback() {
+		return mChannelResponse;
 	}
 
 	@Override
@@ -213,9 +201,9 @@ public class MainActivity extends Activity {
 							new SlaveryFragment(), "slaveryFragment", true);
 				} else {
 					Message msg = new Message();
-					msg.what = MSG_CONNECT_ERROR;
+					msg.what = Constants.MSG_CONNECT_ERROR;
 					msg.arg1 = data.getMsgType();
-					msg.obj = data.getError();
+					msg.obj = data.getErrorMsg();
 					mMsgHandler.sendMessage(msg);
 				}
 			} else if (data.getMsgType() == Frame.MSG_TYPE_DISCONNECT) {
@@ -227,9 +215,9 @@ public class MainActivity extends Activity {
 							new MasterFragment(), "masterFragment", true);
 				} else {
 					Message msg = new Message();
-					msg.what = MSG_REQUEST_ERROR;
+					msg.what = Constants.MSG_REQUEST_ERROR;
 					msg.arg1 = data.getMsgType();
-					msg.obj = data.getError();
+					msg.obj = data.getErrorMsg();
 					mMsgHandler.sendMessage(msg);
 				}
 			} else if (data.getMsgType() == Frame.MSG_TYPE_GIVEUPCONTROL) {

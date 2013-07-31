@@ -4,6 +4,8 @@
     <string name="app_name">Octoller</string>
     <string name="action_settings">设置</string>
     <string name="action_connect">连接</string>
+    <string name="action_connect_bt">蓝牙</string>
+    <string name="action_connect_wifi">WIFI</string>
     <string name="action_request_master">申请控制权</string>
     <string name="action_disconnect">断开</string>
     <string name="action_release_master">释放控制权</string>
@@ -14,5 +16,21 @@
     <string name="title_activity_picking">锁定视角</string>
     <string name="text_welcome">欢迎使用，请先连接服务器</string>
     <string name="text_slavery_hint">如需控制，请点击菜单中的“申请控制权”项目</string>
+    
+    <string name="btn_find">寻找设备</string>
+    <string name="bt_not_avaliable">蓝牙不可用</string>
+    <string name="bt_not_enabled_leaving">蓝牙没有启用</string>
+    <string name="title_paired_devices">已配对设备</string>
+    <string name="title_other_devices">其他可配对设备</string>
+    <string name="button_scan">搜索设备</string>
+    <string name="none_paired">没有已配对设备</string>
+    <string name="scanning">设备搜索中...</string>
+    <string name="none_found">没有找到设备</string>
+    <string name="select_device">请选择一个要进行连接的设备</string>
+    <string name="connect">连接一个设备</string>
+    <string name="discoverable">将本设备设成可见</string>
+    <string name="title_connected_to">已连接的设备：</string>
+    <string name="title_connecting">连接中...</string>
+    <string name="title_not_connected">没有连接</string>
 
 </resources>

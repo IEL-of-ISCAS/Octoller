@@ -5,6 +5,17 @@
         android:id="@+id/action_connect"
         android:orderInCategory="100"
         android:showAsAction="always"
-        android:title="@string/action_connect"/>
+        android:title="@string/action_connect">
+        <menu>
+            <item
+                android:id="@+id/action_connect_bt"
+                android:title="@string/action_connect_bt">
+            </item>
+            <item
+                android:id="@+id/action_connect_wifi"
+                android:title="@string/action_connect_wifi">
+            </item>
+        </menu>
+    </item>
 
 </menu>

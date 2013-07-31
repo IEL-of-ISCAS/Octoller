@@ -6,8 +6,9 @@
  */
 package cn.ac.iscas.iel.vr.octoller.utils;
 
+import android.util.Log;
 import cn.ac.iscas.iel.csdtp.controller.Device;
-import cn.ac.iscas.iel.csdtp.data.ControlFrame;
+import cn.ac.iscas.iel.csdtp.data.DataFrame;
 import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.vr.octoller.MainActivity;
 
@@ -32,28 +33,28 @@ public class ControlMessageUtils {
 
 	public static void connect() {
 		Device mainDevice = mActivity.getDevice();
-		ControlFrame frame = new ControlFrame(mainDevice,
+		DataFrame frame = new DataFrame(mainDevice,
 				Frame.MSG_TYPE_NEWCONNECT);
 		mainDevice.pushToSendQueue(frame);
 	}
 
 	public static void disconnect() {
 		Device mainDevice = mActivity.getDevice();
-		ControlFrame frame = new ControlFrame(mainDevice,
+		DataFrame frame = new DataFrame(mainDevice,
 				Frame.MSG_TYPE_DISCONNECT);
 		mainDevice.pushToSendQueue(frame);
 	}
 	
 	public static void requestControl() {
 		Device mainDevice = mActivity.getDevice();
-		ControlFrame frame = new ControlFrame(mainDevice,
+		DataFrame frame = new DataFrame(mainDevice,
 				Frame.MSG_TYPE_REQUESTCONTROL);
 		mainDevice.pushToSendQueue(frame);
 	}
 	
 	public static void releaseControl() {
 		Device mainDevice = mActivity.getDevice();
-		ControlFrame frame = new ControlFrame(mainDevice,
+		DataFrame frame = new DataFrame(mainDevice,
 				Frame.MSG_TYPE_GIVEUPCONTROL);
 		mainDevice.pushToSendQueue(frame);
 	}
