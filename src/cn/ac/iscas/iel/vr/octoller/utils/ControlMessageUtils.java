@@ -6,7 +6,6 @@
  */
 package cn.ac.iscas.iel.vr.octoller.utils;
 
-import android.util.Log;
 import cn.ac.iscas.iel.csdtp.controller.Device;
 import cn.ac.iscas.iel.csdtp.data.DataFrame;
 import cn.ac.iscas.iel.csdtp.data.Frame;

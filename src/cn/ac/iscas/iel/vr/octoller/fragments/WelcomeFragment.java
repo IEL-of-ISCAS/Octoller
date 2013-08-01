@@ -11,7 +11,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.UUID;
 
 import android.app.Activity;
 import android.app.Fragment;
@@ -90,13 +89,13 @@ public class WelcomeFragment extends Fragment {
 	@Override
 	public void onResume() {
 		super.onResume();
-
-		mIvOctopus.clearAnimation();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+		
+		mIvOctopus.clearAnimation();
 	}
 
 	@Override
@@ -165,6 +164,10 @@ public class WelcomeFragment extends Fragment {
 		switch (requestCode) {
 		case Constants.REQUEST_CONNECT_DEVICE:
 			if (resultCode == Activity.RESULT_OK) {
+				Animation animation = AnimationUtils.loadAnimation(
+						getActivity(), R.anim.loading);
+				mIvOctopus.startAnimation(animation);
+				
 				mBluetoothAdapter.cancelDiscovery();
 				
 				String address = data.getExtras().getString(
@@ -172,7 +175,6 @@ public class WelcomeFragment extends Fragment {
 				BluetoothDevice device = mBluetoothAdapter
 						.getRemoteDevice(address);
 				
-				String ad = mBluetoothAdapter.getAddress();
 				BluetoothSocket btSocket = null;
 				try {
 					btSocket = device
@@ -201,10 +203,6 @@ public class WelcomeFragment extends Fragment {
 				mMainActivity.getDevice().startSending();
 
 				ControlMessageUtils.connect();
-
-				Animation animation = AnimationUtils.loadAnimation(
-						getActivity(), R.anim.loading);
-				mIvOctopus.startAnimation(animation);
 			}
 			break;
 		case Constants.REQUEST_ENABLE_BT:
