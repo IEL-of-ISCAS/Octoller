@@ -136,7 +136,7 @@ public class MasterFragment extends Fragment {
 				case MotionEvent.ACTION_DOWN:
 					try {
 						mMainActivity.resumeSensor();
-						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_DRIVERMANIPULATOR);
+						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_DRIVEMANIPULATOR);
 						mMainActivity.getDevice().startSampling();
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
