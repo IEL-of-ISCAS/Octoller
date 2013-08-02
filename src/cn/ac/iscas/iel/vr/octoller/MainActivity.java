@@ -17,9 +17,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 import cn.ac.iscas.iel.csdtp.channel.IChannelCallback;
-import cn.ac.iscas.iel.csdtp.controller.AccelerometersSensor;
 import cn.ac.iscas.iel.csdtp.controller.Device;
-import cn.ac.iscas.iel.csdtp.controller.MagnetometersSensor;
 import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
 import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.data.ResponseData;
@@ -33,13 +31,9 @@ import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 
 public class MainActivity extends Activity {
 	private Device mDevice;
-	private AccelerometersSensor mAccSensor;
-	private MagnetometersSensor mMagSensor;
 	private RotationSensor mRotSensor;
 
 	private SensorManager mSensorManager;
-	private Sensor mPhyAccSensor;
-	private Sensor mPhyMagSensor;
 	private Sensor mPhyRotSensor;
 
 	private MainSensorListener mSensorListener;
@@ -59,20 +53,12 @@ public class MainActivity extends Activity {
 		mChannelResponse = new ChannelResponseCallback();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
-		mPhyAccSensor = mSensorManager
-				.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-		mPhyMagSensor = mSensorManager
-				.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD);
 		mPhyRotSensor = mSensorManager
 				.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
-		mAccSensor = new AccelerometersSensor();
-		mMagSensor = new MagnetometersSensor();
 		mRotSensor = new RotationSensor();
 
 		try {
-			mDevice.registerSensor(mAccSensor);
-			mDevice.registerSensor(mMagSensor);
 			mDevice.registerSensor(mRotSensor);
 		} catch (ChangeSensorWhileCollectingDataException e) {
 			e.printStackTrace();
@@ -142,10 +128,6 @@ public class MainActivity extends Activity {
 	}
 
 	public void resumeSensor() {
-		mSensorManager.registerListener(mSensorListener, mPhyAccSensor,
-				SensorManager.SENSOR_DELAY_GAME);
-		mSensorManager.registerListener(mSensorListener, mPhyMagSensor,
-				SensorManager.SENSOR_DELAY_GAME);
 		mSensorManager.registerListener(mSensorListener, mPhyRotSensor,
 				SensorManager.SENSOR_DELAY_GAME);
 	}
@@ -177,11 +159,7 @@ public class MainActivity extends Activity {
 		public void onSensorChanged(SensorEvent event) {
 			SensorData<float[]> data = new SensorData<float[]>(Arrays.copyOf(
 					event.values, event.values.length));
-			if (event.sensor == mPhyAccSensor) {
-				mAccSensor.updateSnapshot(data);
-			} else if (event.sensor == mPhyMagSensor) {
-				mMagSensor.updateSnapshot(data);
-			} else if (event.sensor == mPhyRotSensor) {
+			if (event.sensor == mPhyRotSensor) {
 				float[] quaternion = new float[4];
 				SensorManager.getQuaternionFromVector(quaternion, event.values);
 				data = new SensorData<float[]>(Arrays.copyOf(quaternion,
