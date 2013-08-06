@@ -122,35 +122,41 @@ public class WelcomeFragment extends Fragment {
 					tryToConnect();
 				}
 			} else if (item.getItemId() == R.id.action_connect_wifi) {
-				// Prepare socket
-				Socket socket = null;
-				DataInputStream inStream = null;
-				DataOutputStream outStream = null;
-				try {
-					socket = new Socket(Constants.SERVER_IP,
-							Constants.SERVER_PORT);
-					socket.setTcpNoDelay(true);
-					socket.setKeepAlive(true);
-
-					outStream = new DataOutputStream(socket.getOutputStream());
-					inStream = new DataInputStream(socket.getInputStream());
-				} catch (UnknownHostException e1) {
-					e1.printStackTrace();
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				}
-
-				mOutputChannel = new SocketChannel(inStream, outStream);
-				mOutputChannel.setCallback(mMainActivity.getCallback());
-
-				mMainActivity.getDevice().setOutputChannel(mOutputChannel);
-				mMainActivity.getDevice().startSending();
-
-				ControlMessageUtils.connect();
-
 				Animation animation = AnimationUtils.loadAnimation(
 						getActivity(), R.anim.loading);
 				mIvOctopus.startAnimation(animation);
+				
+				
+
+				new Thread() {
+					public void run() {
+						Socket socket = null;
+						DataInputStream inStream = null;
+						DataOutputStream outStream = null;
+						
+						try {
+							socket = new Socket(Constants.SERVER_IP,
+									Constants.SERVER_PORT);
+							socket.setTcpNoDelay(true);
+							socket.setKeepAlive(true);
+							
+							outStream = new DataOutputStream(socket.getOutputStream());
+							inStream = new DataInputStream(socket.getInputStream());
+						} catch (UnknownHostException e1) {
+							e1.printStackTrace();
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						
+						mOutputChannel = new SocketChannel(inStream, outStream);
+						mOutputChannel.setCallback(mMainActivity.getCallback());
+						
+						mMainActivity.getDevice().setOutputChannel(mOutputChannel);
+						mMainActivity.getDevice().startSending();
+						
+						ControlMessageUtils.connect();
+					}
+				}.start();
 			}
 
 			return true;

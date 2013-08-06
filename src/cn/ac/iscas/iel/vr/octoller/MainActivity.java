@@ -50,6 +50,7 @@ public class MainActivity extends Activity {
 		ControlMessageUtils.setActivty(this);
 
 		mDevice = new Device("android");
+		mDevice.setSampleRate(25);
 		mChannelResponse = new ChannelResponseCallback();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
@@ -129,7 +130,7 @@ public class MainActivity extends Activity {
 
 	public void resumeSensor() {
 		mSensorManager.registerListener(mSensorListener, mPhyRotSensor,
-				SensorManager.SENSOR_DELAY_GAME);
+				SensorManager.SENSOR_DELAY_FASTEST);
 	}
 
 	public void pauseSensor() {
