@@ -167,6 +167,7 @@ public class MasterFragment extends Fragment {
 					break;
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
+					mVelometer.onDisappear();
 					mPopupWindow.dismiss();
 					mMainActivity.pauseSensor();
 					mMainActivity.getDevice().stopSampling();
@@ -185,6 +186,14 @@ public class MasterFragment extends Fragment {
 
 				switch (action) {
 				case MotionEvent.ACTION_DOWN:
+					int x = (int) event.getRawX();
+					int y = (int) event.getRawY();
+					
+					mPopupWindow.showAtLocation(mLayoutRoot, Gravity.NO_GRAVITY, x
+							- Constants.OUTER_SIZE / 2, y - Constants.OUTER_SIZE / 2);
+					mPopupWindow.update();
+					mVelometer.onShow(event);
+					
 					try {
 						mMainActivity.resumeSensor();
 						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_DRIVEMANIPULATOR);
@@ -193,9 +202,13 @@ public class MasterFragment extends Fragment {
 						e.printStackTrace();
 					}
 					break;
-
+				case MotionEvent.ACTION_MOVE:
+					mVelometer.onUpdate(event);
+					break;
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
+					mVelometer.onDisappear();
+					mPopupWindow.dismiss();
 					mMainActivity.pauseSensor();
 					mMainActivity.getDevice().stopSampling();
 					break;

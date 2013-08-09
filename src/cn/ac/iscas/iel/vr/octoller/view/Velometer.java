@@ -148,7 +148,10 @@ public class Velometer extends View {
 	}
 
 	public void onDisappear() {
-
+		if (mVeloLevelListener != null) {
+			// TODO calc level
+			mVeloLevelListener.onLevelChanged(INVALID_LEVEL);
+		}
 	}
 
 	protected int calcAngle(MotionEvent event) {
