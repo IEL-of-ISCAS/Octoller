@@ -31,4 +31,8 @@ public class Constants {
 	// Channel output callback
 	public static final int MSG_CONNECT_ERROR = 0;
 	public static final int MSG_REQUEST_ERROR = 1;
+	
+	// Velometer view config
+	public static final int OUTER_SIZE = 500;
+	public static final int INNER_SIZE = 200;
 }

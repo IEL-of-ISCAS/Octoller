@@ -19,6 +19,7 @@ import android.widget.Toast;
 import cn.ac.iscas.iel.csdtp.channel.IChannelCallback;
 import cn.ac.iscas.iel.csdtp.controller.Device;
 import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
+import cn.ac.iscas.iel.csdtp.controller.VelometerSensor;
 import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.data.ResponseData;
 import cn.ac.iscas.iel.csdtp.data.SensorData;
@@ -28,16 +29,20 @@ import cn.ac.iscas.iel.vr.octoller.fragments.SlaveryFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
 import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
+import cn.ac.iscas.iel.vr.octoller.view.IVelometerLevelListener;
+import cn.ac.iscas.iel.vr.octoller.view.Velometer;
 
 public class MainActivity extends Activity {
 	private Device mDevice;
 	private RotationSensor mRotSensor;
+	private VelometerSensor mVeloSensor;
 
 	private SensorManager mSensorManager;
 	private Sensor mPhyRotSensor;
 
 	private MainSensorListener mSensorListener;
 	private ChannelResponseCallback mChannelResponse;
+	private VeloLevelCallback mVeloCallback;
 
 	private Handler mMsgHandler;
 
@@ -58,9 +63,11 @@ public class MainActivity extends Activity {
 				.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR);
 
 		mRotSensor = new RotationSensor();
+		mVeloSensor = new VelometerSensor();
 
 		try {
 			mDevice.registerSensor(mRotSensor);
+			mDevice.registerSensor(mVeloSensor);
 		} catch (ChangeSensorWhileCollectingDataException e) {
 			e.printStackTrace();
 		}
@@ -71,6 +78,12 @@ public class MainActivity extends Activity {
 				"welcomeFragment", true);
 
 		mMsgHandler = new ChannelMessageHandler();
+		
+		SensorData<Integer> data = new SensorData<Integer>();
+		data.setData(Velometer.INVALID_LEVEL);
+		mVeloSensor.updateSnapshot(data);
+		
+		mVeloCallback = new VeloLevelCallback();
 	}
 
 	@Override
@@ -95,6 +108,10 @@ public class MainActivity extends Activity {
 	
 	public IChannelCallback getCallback() {
 		return mChannelResponse;
+	}
+	
+	public IVelometerLevelListener getVeloCallback() {
+		return mVeloCallback;
 	}
 
 	@Override
@@ -168,6 +185,17 @@ public class MainActivity extends Activity {
 				mRotSensor.updateSnapshot(data);
 			}
 		}
+	}
+	
+	protected class VeloLevelCallback implements IVelometerLevelListener {
+
+		@Override
+		public void onLevelChanged(int level) {
+			SensorData<Integer> data = new SensorData<Integer>();
+			data.setData(level);
+			mVeloSensor.updateSnapshot(data);
+		}
+		
 	}
 
 	protected class ChannelResponseCallback implements IChannelCallback {
