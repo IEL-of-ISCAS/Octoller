@@ -24,13 +24,13 @@ import android.view.View;
  * @Project TouchPointVisualizer
  * @Package me.voidmain.ui.controls.touchpointvisualizer
  * @Class TouchPointVisualizer
- * @Date 2013-8-9 下午3:24:36
+ * @Date 2013-8-9
  * @author voidmain
  * @version
  * @since
  */
 public class TouchPointVisualizer extends View {
-	protected static final int SLEEP_TIME = 1000 / 30;
+	protected static final int SLEEP_TIME = 1000 / 60;
 	protected ConcurrentLinkedQueue<TouchPoint> mTouchPointQueue = null;
 	protected Thread mDrawingThread = null;
 	protected Paint mPaint = null;
@@ -70,7 +70,9 @@ public class TouchPointVisualizer extends View {
 				while (!interrupted()) {
 					if (mCurrentEvent != null) {
 						TouchPoint point = new TouchPoint(mCurrentEvent);
-						mTouchPointQueue.add(point);
+						if(point.getMotionEvent() != null) {
+							mTouchPointQueue.add(point);
+						}
 					}
 					postInvalidate();
 					try {
@@ -162,6 +164,7 @@ public class TouchPointVisualizer extends View {
 		protected Date mBornDate;
 
 		public TouchPoint(MotionEvent event) {
+			if(event == null) return;
 			mEvent = MotionEvent.obtain(event);
 			mBornDate = new Date();
 		}

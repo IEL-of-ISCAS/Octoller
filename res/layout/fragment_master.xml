@@ -27,17 +27,20 @@
         android:scrollbars="vertical" >
 
         <Button
-            android:id="@+id/btn_mani_trackball"
+            android:id="@+id/btn_mani_pen_speech"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/manipulator_trackball" />
+            android:drawableLeft="@drawable/btn_pen"
+            android:enabled="false"
+            android:text="@string/manipulator_pen_speech" />
 
         <Button
             android:id="@+id/btn_mani_flight"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:drawableLeft="@drawable/btn_plane"
             android:text="@string/manipulator_flight" />
 
         <Button
@@ -45,6 +48,7 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:drawableLeft="@drawable/btn_car"
             android:text="@string/manipulator_drive" />
 
         <Button
@@ -52,8 +56,8 @@
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:drawableLeft="@drawable/btn_finger"
             android:text="@string/manipulator_multitouch" />
-        
     </LinearLayout>
 
 </RelativeLayout>

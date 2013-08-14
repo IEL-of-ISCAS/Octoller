@@ -9,7 +9,8 @@
     <string name="action_request_master">申请控制权</string>
     <string name="action_disconnect">断开</string>
     <string name="action_release_master">释放控制权</string>
-    <string name="manipulator_trackball">跟踪球</string>
+    <string name="action_go_back">返回</string>
+    <string name="manipulator_pen_speech">笔和语音</string>
     <string name="manipulator_flight">飞行器</string>
     <string name="manipulator_drive">驾驶</string>
     <string name="manipulator_multitouch">多指操作</string>

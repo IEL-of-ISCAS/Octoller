@@ -14,6 +14,9 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import cn.ac.iscas.iel.csdtp.data.Frame;
+import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
+import cn.ac.iscas.iel.vr.octoller.MainActivity;
 import cn.ac.iscas.iel.vr.octoller.R;
 import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 
@@ -30,6 +33,8 @@ import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
  */
 public class SlaveryFragment extends Fragment {
 
+	protected MainActivity mMainActivity;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -44,13 +49,30 @@ public class SlaveryFragment extends Fragment {
 	}
 
 	@Override
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
+		mMainActivity = (MainActivity) this.getActivity();
+	}
+
+	@Override
 	public void onResume() {
 		super.onResume();
+		
+		try {
+			mMainActivity.resumeSensor();
+			mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_PHONEMOVE);
+			mMainActivity.getDevice().startSampling();
+		} catch (MultipleSampleThreadException e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
+		
+		mMainActivity.pauseSensor();
+		mMainActivity.getDevice().stopSampling();
 	}
 
 	@Override

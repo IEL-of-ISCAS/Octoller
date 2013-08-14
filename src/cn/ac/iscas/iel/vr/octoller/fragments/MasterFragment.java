@@ -56,7 +56,7 @@ public class MasterFragment extends Fragment {
 	protected Button mBtnManiFlight;
 	protected Button mBtnDriver;
 	protected Button mBtnMultiTouch;
-	
+
 	protected ViewGroup mLayoutRoot;
 	protected PopupWindow mPopupWindow;
 	protected View mPopupView;
@@ -81,20 +81,25 @@ public class MasterFragment extends Fragment {
 
 		mMainActivity = (MainActivity) this.getActivity();
 		setupViews(this.getView());
-		
+
 		mLayoutRoot = (ViewGroup) this.getView().findViewById(R.id.layout_root);
-		
-		LayoutInflater inflater = (LayoutInflater) mMainActivity.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+		LayoutInflater inflater = (LayoutInflater) mMainActivity
+				.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mPopupView = inflater.inflate(R.layout.popup, null);
 		mVelometer = (Velometer) mPopupView.findViewById(R.id.velometer);
 		mVelometer.setVelometerLevelListener(mMainActivity.getVeloCallback());
-		
+
 		VelometerSlot level1 = new VelometerSlot(1, 0, 60, "加速1", Color.RED);
-		VelometerSlot level2 = new VelometerSlot(2, 60, 120, "加速2", Color.MAGENTA);
+		VelometerSlot level2 = new VelometerSlot(2, 60, 120, "加速2",
+				Color.MAGENTA);
 		VelometerSlot level3 = new VelometerSlot(3, 120, 180, "加速3", Color.BLUE);
-		VelometerSlot level4 = new VelometerSlot(-3, 180, 240, "减速3", Color.CYAN);
-		VelometerSlot level5 = new VelometerSlot(-2, 240, 300, "减速2", Color.DKGRAY);
-		VelometerSlot level6 = new VelometerSlot(-1, 300, 360, "减速1", Color.GREEN);
+		VelometerSlot level4 = new VelometerSlot(-3, 180, 240, "减速3",
+				Color.CYAN);
+		VelometerSlot level5 = new VelometerSlot(-2, 240, 300, "减速2",
+				Color.DKGRAY);
+		VelometerSlot level6 = new VelometerSlot(-1, 300, 360, "减速1",
+				Color.GREEN);
 		List<VelometerSlot> slots = new ArrayList<VelometerSlot>();
 		slots.add(level1);
 		slots.add(level2);
@@ -148,29 +153,19 @@ public class MasterFragment extends Fragment {
 
 				switch (action) {
 				case MotionEvent.ACTION_DOWN:
-//					int x = (int) event.getRawX();
-//					int y = (int) event.getRawY();
-//					
-//					mPopupWindow.showAtLocation(mLayoutRoot, Gravity.NO_GRAVITY, x
-//							- Constants.OUTER_SIZE / 2, y - Constants.OUTER_SIZE / 2);
-//					mPopupWindow.update();
-//					mVelometer.onShow(event);
-					
 					try {
 						mMainActivity.resumeSensor();
-						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_FLIGHTMANIPULATOR);
+						mMainActivity.getDevice().setCurrentMsgType(
+								Frame.MSG_TYPE_FLIGHTMANIPULATOR);
 						mMainActivity.getDevice().startSampling();
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
 					}
 					break;
 				case MotionEvent.ACTION_MOVE:
-//					mVelometer.onUpdate(event);
 					break;
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
-//					mVelometer.onDisappear();
-//					mPopupWindow.dismiss();
 					mMainActivity.pauseSensor();
 					mMainActivity.getDevice().stopSampling();
 					break;
@@ -178,7 +173,7 @@ public class MasterFragment extends Fragment {
 				return true;
 			}
 		});
-		
+
 		mBtnDriver = (Button) view.findViewById(R.id.btn_mani_drive);
 		mBtnDriver.setOnTouchListener(new View.OnTouchListener() {
 
@@ -190,15 +185,17 @@ public class MasterFragment extends Fragment {
 				case MotionEvent.ACTION_DOWN:
 					int x = (int) event.getRawX();
 					int y = (int) event.getRawY();
-					
-					mPopupWindow.showAtLocation(mLayoutRoot, Gravity.NO_GRAVITY, x
-							- Constants.OUTER_SIZE / 2, y - Constants.OUTER_SIZE / 2);
+
+					mPopupWindow.showAtLocation(mLayoutRoot,
+							Gravity.NO_GRAVITY, x - Constants.OUTER_SIZE / 2, y
+									- Constants.OUTER_SIZE / 2);
 					mPopupWindow.update();
 					mVelometer.onShow(event);
-					
+
 					try {
 						mMainActivity.resumeSensor();
-						mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_DRIVEMANIPULATOR);
+						mMainActivity.getDevice().setCurrentMsgType(
+								Frame.MSG_TYPE_DRIVEMANIPULATOR);
 						mMainActivity.getDevice().startSampling();
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
@@ -218,10 +215,10 @@ public class MasterFragment extends Fragment {
 				return true;
 			}
 		});
-		
+
 		mBtnMultiTouch = (Button) view.findViewById(R.id.btn_mani_multitouch);
 		mBtnMultiTouch.setOnClickListener(new View.OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				FragmentTransactionHelper.transTo(mMainActivity,

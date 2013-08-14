@@ -3,6 +3,9 @@ package cn.ac.iscas.iel.vr.octoller.fragments;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +35,8 @@ public class MultiTouchFragment extends Fragment {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -86,10 +91,20 @@ public class MultiTouchFragment extends Fragment {
 	}
 
 	@Override
-	public void onStop() {
-		super.onStop();
-		FragmentTransactionHelper.transTo(mMainActivity, new MasterFragment(),
-				"masterFragment", false);
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		inflater.inflate(R.menu.multitouch, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.action_go_back:
+			FragmentTransactionHelper.transTo(mMainActivity, new MasterFragment(),
+					"masterFragment", false);
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 }

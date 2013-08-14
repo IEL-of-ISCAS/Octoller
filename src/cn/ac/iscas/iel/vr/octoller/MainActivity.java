@@ -59,7 +59,7 @@ public class MainActivity extends Activity {
 		ControlMessageUtils.setActivty(this);
 
 		mDevice = new Device("android");
-		mDevice.setSampleRate(25);
+		mDevice.setSampleRate(20);
 		mChannelResponse = new ChannelResponseCallback();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
@@ -86,7 +86,7 @@ public class MainActivity extends Activity {
 		mMsgHandler = new ChannelMessageHandler();
 
 		SensorData<Integer> data = new SensorData<Integer>();
-		data.setData(Velometer.INVALID_LEVEL);
+		data.setD(Velometer.INVALID_LEVEL);
 		mVeloSensor.updateSnapshot(data);
 
 		float[] emptyArray = { 0f, 0f, 0f, 0f };
@@ -216,7 +216,7 @@ public class MainActivity extends Activity {
 		@Override
 		public void onLevelChanged(int level) {
 			SensorData<Integer> data = new SensorData<Integer>();
-			data.setData(level);
+			data.setD(level);
 			mVeloSensor.updateSnapshot(data);
 		}
 
