@@ -41,7 +41,7 @@ public class FragmentTransactionHelper {
 					R.animator.slide_out_right);
 		}
 
-		ft.replace(R.id.fragment_container, newFragment, name);
+		ft.replace(R.id.fragment_container, newFragment, name).addToBackStack(name);
 
 		ft.commit();
 	}

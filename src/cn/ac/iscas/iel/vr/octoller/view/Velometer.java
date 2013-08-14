@@ -37,7 +37,7 @@ public class Velometer extends View {
 	protected static final double DEGREE_TO_PI = 180 / Math.PI;
 	protected static final float BORDER_PERCENT = 0.03f;
 
-	public static final int INVALID_LEVEL = -1;
+	public static final int INVALID_LEVEL = -10000;
 	public static final int ANGLE_NOT_MOVED = -1;
 
 	protected MotionEvent mStartEvent = null;

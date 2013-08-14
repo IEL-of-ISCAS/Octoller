@@ -19,6 +19,7 @@ import android.widget.Toast;
 import cn.ac.iscas.iel.csdtp.channel.IChannelCallback;
 import cn.ac.iscas.iel.csdtp.controller.Device;
 import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
+import cn.ac.iscas.iel.csdtp.controller.TouchScreenSensor;
 import cn.ac.iscas.iel.csdtp.controller.VelometerSensor;
 import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.data.ResponseData;
@@ -30,12 +31,14 @@ import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
 import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
 import cn.ac.iscas.iel.vr.octoller.view.IVelometerLevelListener;
+import cn.ac.iscas.iel.vr.octoller.view.TRZGestureDetector.MultiTouchEventListener;
 import cn.ac.iscas.iel.vr.octoller.view.Velometer;
 
 public class MainActivity extends Activity {
 	private Device mDevice;
 	private RotationSensor mRotSensor;
 	private VelometerSensor mVeloSensor;
+	private TouchScreenSensor mTouchSensor;
 
 	private SensorManager mSensorManager;
 	private Sensor mPhyRotSensor;
@@ -43,6 +46,7 @@ public class MainActivity extends Activity {
 	private MainSensorListener mSensorListener;
 	private ChannelResponseCallback mChannelResponse;
 	private VeloLevelCallback mVeloCallback;
+	private TRZGestureCallback mGestureCallback;
 
 	private Handler mMsgHandler;
 
@@ -64,10 +68,12 @@ public class MainActivity extends Activity {
 
 		mRotSensor = new RotationSensor();
 		mVeloSensor = new VelometerSensor();
+		mTouchSensor = new TouchScreenSensor();
 
 		try {
 			mDevice.registerSensor(mRotSensor);
 			mDevice.registerSensor(mVeloSensor);
+			mDevice.registerSensor(mTouchSensor);
 		} catch (ChangeSensorWhileCollectingDataException e) {
 			e.printStackTrace();
 		}
@@ -78,12 +84,17 @@ public class MainActivity extends Activity {
 				"welcomeFragment", true);
 
 		mMsgHandler = new ChannelMessageHandler();
-		
+
 		SensorData<Integer> data = new SensorData<Integer>();
 		data.setData(Velometer.INVALID_LEVEL);
 		mVeloSensor.updateSnapshot(data);
-		
+
+		float[] emptyArray = { 0f, 0f, 0f, 0f };
+		SensorData<float[]> touchData = new SensorData<float[]>(emptyArray);
+		mTouchSensor.updateSnapshot(touchData);
+
 		mVeloCallback = new VeloLevelCallback();
+		mGestureCallback = new TRZGestureCallback();
 	}
 
 	@Override
@@ -105,13 +116,17 @@ public class MainActivity extends Activity {
 	public Device getDevice() {
 		return mDevice;
 	}
-	
+
 	public IChannelCallback getCallback() {
 		return mChannelResponse;
 	}
-	
+
 	public IVelometerLevelListener getVeloCallback() {
 		return mVeloCallback;
+	}
+
+	public MultiTouchEventListener getMatrixCallback() {
+		return mGestureCallback;
 	}
 
 	@Override
@@ -151,6 +166,15 @@ public class MainActivity extends Activity {
 	}
 
 	public void pauseSensor() {
+		float[] array = { 0f, 0f, 0f, 1.0f };
+		SensorData<float[]> originData = new SensorData<float[]>(Arrays.copyOf(
+				array, array.length));
+
+		mRotSensor.updateSnapshot(originData);
+
+		float[] emptyArray = { 0f, 0f, 0f, 0f };
+		SensorData<float[]> touchData = new SensorData<float[]>(emptyArray);
+		mTouchSensor.updateSnapshot(touchData);
 		mSensorManager.unregisterListener(mSensorListener);
 	}
 
@@ -186,7 +210,7 @@ public class MainActivity extends Activity {
 			}
 		}
 	}
-	
+
 	protected class VeloLevelCallback implements IVelometerLevelListener {
 
 		@Override
@@ -195,7 +219,18 @@ public class MainActivity extends Activity {
 			data.setData(level);
 			mVeloSensor.updateSnapshot(data);
 		}
-		
+
+	}
+
+	protected class TRZGestureCallback implements MultiTouchEventListener {
+
+		@Override
+		public void onEventChanged(int phase, int type, float x, float y) {
+			float[] touchArray = { phase, type, x, y };
+			SensorData<float[]> touchData = new SensorData<float[]>(touchArray);
+			mTouchSensor.updateSnapshot(touchData);
+		}
+
 	}
 
 	protected class ChannelResponseCallback implements IChannelCallback {

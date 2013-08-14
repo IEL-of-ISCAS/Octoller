@@ -48,11 +48,11 @@
             android:text="@string/manipulator_drive" />
 
         <Button
-            android:id="@+id/btn_mani_ufo"
+            android:id="@+id/btn_mani_multitouch"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/manipulator_ufo" />
+            android:text="@string/manipulator_multitouch" />
         
     </LinearLayout>
 
