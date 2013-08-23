@@ -34,11 +34,11 @@ public class FragmentTransactionHelper {
 		FragmentTransaction ft = activity.getFragmentManager()
 				.beginTransaction();
 		if (forward) {
-			ft.setCustomAnimations(R.animator.slide_in_right,
-					R.animator.slide_out_left);
+			ft.setCustomAnimations(R.animator.rotate_in_left_to_right,
+					R.animator.rotate_out_left_to_right);
 		} else {
-			ft.setCustomAnimations(R.animator.slide_in_left,
-					R.animator.slide_out_right);
+			ft.setCustomAnimations(R.animator.rotate_in_right_to_left,
+					R.animator.rotate_out_right_to_left);
 		}
 
 		ft.replace(R.id.fragment_container, newFragment, name);

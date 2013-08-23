@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res/cn.ac.iscas.iel.vr.octoller"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <me.voidmain.ui.controls.atily.ATily
+        android:id="@+id/tily"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        custom:base_url="http://10.0.0.91/earth" />
+
+</RelativeLayout>

@@ -13,6 +13,7 @@
     <string name="manipulator_pen_speech">笔和语音</string>
     <string name="manipulator_flight">飞行器</string>
     <string name="manipulator_drive">驾驶</string>
+    <string name="manipulator_maps">缩略图</string>
     <string name="manipulator_multitouch">多指操作</string>
     <string name="title_activity_picking">锁定视角</string>
     <string name="text_welcome">欢迎使用，请先连接服务器</string>
@@ -34,4 +35,8 @@
     <string name="title_connecting">连接中...</string>
     <string name="title_not_connected">没有连接</string>
 
+    <string name="error_base_url_not_specified">Please specify base_url for ATily widget.</string>
+    <string name="error_network_timeout">Network timeout.</string>
+    <string name="error_response_parsing_error">Error parsing network response.</string>
+    
 </resources>

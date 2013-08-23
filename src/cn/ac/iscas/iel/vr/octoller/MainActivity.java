@@ -30,6 +30,7 @@ import cn.ac.iscas.iel.vr.octoller.fragments.SlaveryFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
 import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
+import cn.ac.iscas.iel.vr.octoller.view.IOverlayTouchListener;
 import cn.ac.iscas.iel.vr.octoller.view.IVelometerLevelListener;
 import cn.ac.iscas.iel.vr.octoller.view.TRZGestureDetector.MultiTouchEventListener;
 import cn.ac.iscas.iel.vr.octoller.view.Velometer;
@@ -47,6 +48,7 @@ public class MainActivity extends Activity {
 	private ChannelResponseCallback mChannelResponse;
 	private VeloLevelCallback mVeloCallback;
 	private TRZGestureCallback mGestureCallback;
+	private CameraRegionCallback mCameraCallback;
 
 	private Handler mMsgHandler;
 
@@ -95,6 +97,7 @@ public class MainActivity extends Activity {
 
 		mVeloCallback = new VeloLevelCallback();
 		mGestureCallback = new TRZGestureCallback();
+		mCameraCallback = new CameraRegionCallback();
 	}
 
 	@Override
@@ -127,6 +130,10 @@ public class MainActivity extends Activity {
 
 	public MultiTouchEventListener getMatrixCallback() {
 		return mGestureCallback;
+	}
+	
+	public IOverlayTouchListener getCameraCallback() {
+		return mCameraCallback;
 	}
 
 	@Override
@@ -231,6 +238,17 @@ public class MainActivity extends Activity {
 			mTouchSensor.updateSnapshot(touchData);
 		}
 
+	}
+	
+	protected class CameraRegionCallback implements IOverlayTouchListener {
+
+		@Override
+		public void onOverlayRegionChanged(float centerX, float centerY) {
+			float[] touchArray = { centerX, centerY };
+			SensorData<float[]> touchData = new SensorData<float[]>(touchArray);
+			mTouchSensor.updateSnapshot(touchData);
+		}
+		
 	}
 
 	protected class ChannelResponseCallback implements IChannelCallback {

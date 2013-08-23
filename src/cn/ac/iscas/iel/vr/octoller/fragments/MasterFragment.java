@@ -56,6 +56,7 @@ public class MasterFragment extends Fragment {
 	protected Button mBtnManiFlight;
 	protected Button mBtnDriver;
 	protected Button mBtnMultiTouch;
+	protected Button mBtnMaps;
 
 	protected ViewGroup mLayoutRoot;
 	protected PopupWindow mPopupWindow;
@@ -223,6 +224,16 @@ public class MasterFragment extends Fragment {
 			public void onClick(View v) {
 				FragmentTransactionHelper.transTo(mMainActivity,
 						new MultiTouchFragment(), "multiTouchFragment", true);
+			}
+		});
+		
+		mBtnMaps = (Button) view.findViewById(R.id.btn_mani_map);
+		mBtnMaps.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				FragmentTransactionHelper.transTo(mMainActivity,
+						new MapsFragment(), "mapsFragment", true);
 			}
 		});
 	}

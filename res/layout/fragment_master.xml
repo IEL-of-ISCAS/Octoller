@@ -52,6 +52,14 @@
             android:text="@string/manipulator_drive" />
 
         <Button
+            android:id="@+id/btn_mani_map"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableLeft="@drawable/btn_maps"
+            android:text="@string/manipulator_maps" />
+        
+        <Button
             android:id="@+id/btn_mani_multitouch"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
