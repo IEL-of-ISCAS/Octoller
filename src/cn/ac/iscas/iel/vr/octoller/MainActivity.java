@@ -2,6 +2,7 @@ package cn.ac.iscas.iel.vr.octoller;
 
 import java.util.Arrays;
 
+import me.voidmain.ui.controls.atily.ATily.IViewportChangedListener;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Service;
@@ -30,7 +31,6 @@ import cn.ac.iscas.iel.vr.octoller.fragments.SlaveryFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
 import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
-import cn.ac.iscas.iel.vr.octoller.view.IOverlayTouchListener;
 import cn.ac.iscas.iel.vr.octoller.view.IVelometerLevelListener;
 import cn.ac.iscas.iel.vr.octoller.view.TRZGestureDetector.MultiTouchEventListener;
 import cn.ac.iscas.iel.vr.octoller.view.Velometer;
@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
 	private ChannelResponseCallback mChannelResponse;
 	private VeloLevelCallback mVeloCallback;
 	private TRZGestureCallback mGestureCallback;
-	private CameraRegionCallback mCameraCallback;
+	private ViewportChangedCallback mCameraCallback;
 
 	private Handler mMsgHandler;
 
@@ -97,7 +97,7 @@ public class MainActivity extends Activity {
 
 		mVeloCallback = new VeloLevelCallback();
 		mGestureCallback = new TRZGestureCallback();
-		mCameraCallback = new CameraRegionCallback();
+		mCameraCallback = new ViewportChangedCallback();
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class MainActivity extends Activity {
 		return mGestureCallback;
 	}
 	
-	public IOverlayTouchListener getCameraCallback() {
+	public IViewportChangedListener getViewportCallback() {
 		return mCameraCallback;
 	}
 
@@ -240,11 +240,11 @@ public class MainActivity extends Activity {
 
 	}
 	
-	protected class CameraRegionCallback implements IOverlayTouchListener {
+	protected class ViewportChangedCallback implements IViewportChangedListener {
 
 		@Override
-		public void onOverlayRegionChanged(float centerX, float centerY) {
-			float[] touchArray = { centerX, centerY };
+		public void onViewportChanged(float ratioX, float ratioY, float ratioZ) {
+			float[] touchArray = { ratioX, ratioY, ratioZ };
 			SensorData<float[]> touchData = new SensorData<float[]>(touchArray);
 			mTouchSensor.updateSnapshot(touchData);
 		}

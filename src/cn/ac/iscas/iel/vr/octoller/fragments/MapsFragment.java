@@ -7,8 +7,11 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import cn.ac.iscas.iel.csdtp.data.Frame;
+import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
 import cn.ac.iscas.iel.vr.octoller.MainActivity;
 import cn.ac.iscas.iel.vr.octoller.R;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
@@ -48,31 +51,31 @@ public class MapsFragment extends Fragment {
 		mMainActivity = (MainActivity) this.getActivity();
 		View view = this.getView();
 		mTily = (ATily) view.findViewById(R.id.tily);
-//		mOverlayImageView.setOverlayTouchListener(mMainActivity.getCameraCallback());
-//		mOverlayImageView.setOnTouchListener(new View.OnTouchListener() {
-//			
-//			@Override
-//			public boolean onTouch(View v, MotionEvent event) {
-//				switch (event.getAction() & MotionEvent.ACTION_MASK) {
-//				case MotionEvent.ACTION_DOWN:
-//					try {
-//						mMainActivity.resumeSensor();
-//						mMainActivity.getDevice().setCurrentMsgType(
-//								Frame.MSG_TYPE_MINIMAP);
-//						mMainActivity.getDevice().startSampling();
-//					} catch (MultipleSampleThreadException e) {
-//						e.printStackTrace();
-//					}
-//					break;
-//				case MotionEvent.ACTION_UP:
-//				case MotionEvent.ACTION_CANCEL:
-//					mMainActivity.pauseSensor();
-//					mMainActivity.getDevice().stopSampling();
-//					break;
-//				}
-//				return false;
-//			}
-//		});
+		mTily.setViewportChangedListener(mMainActivity.getViewportCallback());
+		mTily.setOnTouchListener(new View.OnTouchListener() {
+			
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				switch (event.getAction() & MotionEvent.ACTION_MASK) {
+				case MotionEvent.ACTION_DOWN:
+					try {
+						mMainActivity.resumeSensor();
+						mMainActivity.getDevice().setCurrentMsgType(
+								Frame.MSG_TYPE_MINIMAP);
+						mMainActivity.getDevice().startSampling();
+					} catch (MultipleSampleThreadException e) {
+						e.printStackTrace();
+					}
+					break;
+				case MotionEvent.ACTION_UP:
+				case MotionEvent.ACTION_CANCEL:
+					mMainActivity.pauseSensor();
+					mMainActivity.getDevice().stopSampling();
+					break;
+				}
+				return false;
+			}
+		});
 	}
 
 	@Override

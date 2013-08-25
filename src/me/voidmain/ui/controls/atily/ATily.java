@@ -64,6 +64,11 @@ public class ATily extends SurfaceView implements SurfaceHolder.Callback,
 
 	protected GestureDetectorCompat mGestureDetector;
 	protected ScaleGestureDetector mScaleDetector;
+	protected IViewportChangedListener mViewportChangedListener;
+	
+	public interface IViewportChangedListener {
+		public void onViewportChanged(float ratioX, float ratioY, float ratioZ);
+	}
 
 	public ATily(Context context) {
 		super(context);
@@ -78,6 +83,14 @@ public class ATily extends SurfaceView implements SurfaceHolder.Callback,
 	public ATily(Context context, AttributeSet attrs, int defStyle) {
 		super(context, attrs, defStyle);
 		initialize(attrs);
+	}
+	
+	public void setViewportChangedListener(IViewportChangedListener listener) {
+		mViewportChangedListener = listener;
+	}
+	
+	public IViewportChangedListener getViewportChangedListener() {
+		return mViewportChangedListener;
 	}
 
 	public void initialize(AttributeSet attrs) {
@@ -231,6 +244,13 @@ public class ATily extends SurfaceView implements SurfaceHolder.Callback,
 	}
 
 	private void updateCoveredTiles() {
+		if(mViewportChangedListener != null) {
+			float ratioX = mViewportRect.centerX() / mWorldSize;
+			float ratioY = mViewportRect.centerY() / mWorldSize;
+			float ratioZ = 1.0f - (float)Math.pow(2, (mCurLevel - 1 - mTSMeta.getTotalLevel()));
+			mViewportChangedListener.onViewportChanged(ratioX, ratioY, ratioZ);
+		}
+		
 		// Remove last tiles
 		mCurCoveredTileQuadKeys.clear();
 		for (Tile tile : mCoveredTiles) {
