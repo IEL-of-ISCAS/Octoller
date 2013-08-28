@@ -14,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
 import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
 import cn.ac.iscas.iel.vr.octoller.MainActivity;
@@ -61,7 +62,7 @@ public class SlaveryFragment extends Fragment {
 		try {
 			mMainActivity.resumeSensor();
 			mMainActivity.getDevice().setCurrentMsgType(Frame.MSG_TYPE_PHONEMOVE);
-			mMainActivity.getDevice().startSampling();
+			mMainActivity.getDevice().startSampling(RotationSensor.getMyName());
 		} catch (MultipleSampleThreadException e) {
 			e.printStackTrace();
 		}

@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import cn.ac.iscas.iel.csdtp.controller.TouchScreenSensor;
 import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
 import cn.ac.iscas.iel.vr.octoller.MainActivity;
@@ -69,7 +70,7 @@ public class MultiTouchFragment extends Fragment {
 						mMainActivity.resumeSensor();
 						mMainActivity.getDevice().setCurrentMsgType(
 								Frame.MSG_TYPE_MULTITOUCHMANIPULATOR);
-						mMainActivity.getDevice().startSampling();
+						mMainActivity.getDevice().startSampling(TouchScreenSensor.getMyName());
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
 					}

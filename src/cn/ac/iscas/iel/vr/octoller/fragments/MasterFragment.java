@@ -26,6 +26,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.PopupWindow;
+import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
+import cn.ac.iscas.iel.csdtp.controller.VelometerSensor;
 import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
 import cn.ac.iscas.iel.vr.octoller.Constants;
@@ -158,7 +160,7 @@ public class MasterFragment extends Fragment {
 						mMainActivity.resumeSensor();
 						mMainActivity.getDevice().setCurrentMsgType(
 								Frame.MSG_TYPE_FLIGHTMANIPULATOR);
-						mMainActivity.getDevice().startSampling();
+						mMainActivity.getDevice().startSampling(RotationSensor.getMyName());
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
 					}
@@ -197,7 +199,7 @@ public class MasterFragment extends Fragment {
 						mMainActivity.resumeSensor();
 						mMainActivity.getDevice().setCurrentMsgType(
 								Frame.MSG_TYPE_DRIVEMANIPULATOR);
-						mMainActivity.getDevice().startSampling();
+						mMainActivity.getDevice().startSampling(RotationSensor.getMyName(), VelometerSensor.getMyName());
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
 					}
