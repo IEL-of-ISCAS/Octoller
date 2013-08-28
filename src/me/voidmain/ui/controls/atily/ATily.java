@@ -247,7 +247,7 @@ public class ATily extends SurfaceView implements SurfaceHolder.Callback,
 		if(mViewportChangedListener != null) {
 			float ratioX = mViewportRect.centerX() / mWorldSize;
 			float ratioY = mViewportRect.centerY() / mWorldSize;
-			float ratioZ = 1.0f - (float)Math.pow(2, (mCurLevel - 1 - mTSMeta.getTotalLevel()));
+			float ratioZ = (float)Math.pow(2, (mCurLevel - 1 - mTSMeta.getTotalLevel()));
 			mViewportChangedListener.onViewportChanged(ratioX, ratioY, ratioZ);
 		}
 		
