@@ -14,6 +14,7 @@ import android.hardware.SensorManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -104,22 +105,19 @@ public class MainActivity extends Activity {
 	protected void onDestroy() {
 		super.onDestroy();
 		
+		
 		ControlMessageUtils.releaseControl();
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
+		ControlMessageUtils.disconnect();
+		while(mDevice.getOutQueue().size() != 0) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
 		}
+		Log.e("TAGS", "got here");
 
 		mDevice.setOutputChannel(null);
-		ControlMessageUtils.disconnect();
-
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
 		mDevice.stopSending();
 	}
 

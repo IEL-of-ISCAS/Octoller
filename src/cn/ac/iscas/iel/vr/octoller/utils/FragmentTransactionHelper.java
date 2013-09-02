@@ -31,6 +31,8 @@ public class FragmentTransactionHelper {
 
 	public static void transTo(Activity activity, Fragment newFragment,
 			String name, boolean forward) {
+		if(activity.isFinishing()) return;
+		
 		FragmentTransaction ft = activity.getFragmentManager()
 				.beginTransaction();
 		if (forward) {
