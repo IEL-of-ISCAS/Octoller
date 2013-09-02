@@ -57,5 +57,19 @@ public class ControlMessageUtils {
 				Frame.MSG_TYPE_GIVEUPCONTROL);
 		mainDevice.pushToSendQueue(frame);
 	}
+	
+	public static void resetManipulator() {
+		Device mainDevice = mActivity.getDevice();
+		DataFrame frame = new DataFrame(mainDevice, 
+				Frame.MSG_TYPE_ENDMANIPULATOR);
+		mainDevice.pushToSendQueue(frame);
+	}
+	
+	public static void resetPhoneState() {
+		Device mainDevice = mActivity.getDevice();
+		DataFrame frame = new DataFrame(mainDevice, 
+				Frame.MSG_TYPE_PHONE_POSITION);
+		mainDevice.pushToSendQueue(frame);
+	}
 
 }

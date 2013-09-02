@@ -70,8 +70,8 @@ public class MapsFragment extends Fragment {
 					break;
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
-					mMainActivity.pauseSensor();
 					mMainActivity.getDevice().stopSampling();
+					mMainActivity.pauseSensor();
 					break;
 				}
 				return false;

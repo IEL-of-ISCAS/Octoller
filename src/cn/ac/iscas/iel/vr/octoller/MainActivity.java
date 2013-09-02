@@ -103,6 +103,13 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
+		
+		ControlMessageUtils.releaseControl();
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+		}
 
 		mDevice.setOutputChannel(null);
 		ControlMessageUtils.disconnect();

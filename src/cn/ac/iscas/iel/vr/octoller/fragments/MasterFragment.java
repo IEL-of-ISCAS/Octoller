@@ -11,7 +11,6 @@ import java.util.List;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.view.MotionEventCompat;
@@ -24,7 +23,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.PopupWindow;
 import cn.ac.iscas.iel.csdtp.controller.RotationSensor;
 import cn.ac.iscas.iel.csdtp.controller.VelometerSensor;
@@ -32,7 +30,6 @@ import cn.ac.iscas.iel.csdtp.data.Frame;
 import cn.ac.iscas.iel.csdtp.exception.MultipleSampleThreadException;
 import cn.ac.iscas.iel.vr.octoller.Constants;
 import cn.ac.iscas.iel.vr.octoller.MainActivity;
-import cn.ac.iscas.iel.vr.octoller.PickingActivity;
 import cn.ac.iscas.iel.vr.octoller.R;
 import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
 import cn.ac.iscas.iel.vr.octoller.utils.FragmentTransactionHelper;
@@ -54,7 +51,6 @@ public class MasterFragment extends Fragment {
 
 	protected MainActivity mMainActivity;
 
-	protected ImageButton mBtnLock;
 	protected Button mBtnManiFlight;
 	protected Button mBtnDriver;
 	protected Button mBtnMultiTouch;
@@ -93,15 +89,15 @@ public class MasterFragment extends Fragment {
 		mVelometer = (Velometer) mPopupView.findViewById(R.id.velometer);
 		mVelometer.setVelometerLevelListener(mMainActivity.getVeloCallback());
 
-		VelometerSlot level1 = new VelometerSlot(1, 0, 60, "º”ÀŸ1", Color.RED);
-		VelometerSlot level2 = new VelometerSlot(2, 60, 120, "º”ÀŸ2",
+		VelometerSlot level1 = new VelometerSlot(1, 0, 60, "Âä†ÈÄü1", Color.RED);
+		VelometerSlot level2 = new VelometerSlot(2, 60, 120, "Âä†ÈÄü2",
 				Color.MAGENTA);
-		VelometerSlot level3 = new VelometerSlot(3, 120, 180, "º”ÀŸ3", Color.BLUE);
-		VelometerSlot level4 = new VelometerSlot(-3, 180, 240, "ºıÀŸ3",
+		VelometerSlot level3 = new VelometerSlot(3, 120, 180, "Âä†ÈÄü3", Color.BLUE);
+		VelometerSlot level4 = new VelometerSlot(-3, 180, 240, "ÂáèÈÄü3",
 				Color.CYAN);
-		VelometerSlot level5 = new VelometerSlot(-2, 240, 300, "ºıÀŸ2",
+		VelometerSlot level5 = new VelometerSlot(-2, 240, 300, "ÂáèÈÄü2",
 				Color.DKGRAY);
-		VelometerSlot level6 = new VelometerSlot(-1, 300, 360, "ºıÀŸ1",
+		VelometerSlot level6 = new VelometerSlot(-1, 300, 360, "ÂáèÈÄü1",
 				Color.GREEN);
 		List<VelometerSlot> slots = new ArrayList<VelometerSlot>();
 		slots.add(level1);
@@ -135,17 +131,6 @@ public class MasterFragment extends Fragment {
 	 * Helper functions
 	 */
 	protected void setupViews(View view) {
-		mBtnLock = (ImageButton) view.findViewById(R.id.btn_lock_view);
-		mBtnLock.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				// TODO change to fragment
-				Intent gotoPickIntent = new Intent(mMainActivity,
-						PickingActivity.class);
-				mMainActivity.startActivity(gotoPickIntent);
-			}
-		});
 
 		mBtnManiFlight = (Button) view.findViewById(R.id.btn_mani_flight);
 		mBtnManiFlight.setOnTouchListener(new View.OnTouchListener() {
@@ -160,6 +145,13 @@ public class MasterFragment extends Fragment {
 						mMainActivity.resumeSensor();
 						mMainActivity.getDevice().setCurrentMsgType(
 								Frame.MSG_TYPE_FLIGHTMANIPULATOR);
+						
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						} // sleep 100 ms
+						
 						mMainActivity.getDevice().startSampling(RotationSensor.getMyName());
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
@@ -169,8 +161,9 @@ public class MasterFragment extends Fragment {
 					break;
 				case MotionEvent.ACTION_UP:
 				case MotionEvent.ACTION_CANCEL:
-					mMainActivity.pauseSensor();
+					ControlMessageUtils.resetManipulator();
 					mMainActivity.getDevice().stopSampling();
+					mMainActivity.pauseSensor();
 					break;
 				}
 				return true;
@@ -199,6 +192,11 @@ public class MasterFragment extends Fragment {
 						mMainActivity.resumeSensor();
 						mMainActivity.getDevice().setCurrentMsgType(
 								Frame.MSG_TYPE_DRIVEMANIPULATOR);
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						} // sleep 100 ms
 						mMainActivity.getDevice().startSampling(RotationSensor.getMyName(), VelometerSensor.getMyName());
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
@@ -211,8 +209,9 @@ public class MasterFragment extends Fragment {
 				case MotionEvent.ACTION_CANCEL:
 					mVelometer.onDisappear();
 					mPopupWindow.dismiss();
-					mMainActivity.pauseSensor();
+					ControlMessageUtils.resetManipulator();
 					mMainActivity.getDevice().stopSampling();
+					mMainActivity.pauseSensor();
 					break;
 				}
 				return true;
