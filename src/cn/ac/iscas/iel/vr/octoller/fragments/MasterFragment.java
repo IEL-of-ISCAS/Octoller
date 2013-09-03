@@ -89,15 +89,15 @@ public class MasterFragment extends Fragment {
 		mVelometer = (Velometer) mPopupView.findViewById(R.id.velometer);
 		mVelometer.setVelometerLevelListener(mMainActivity.getVeloCallback());
 
-		VelometerSlot level1 = new VelometerSlot(1, 0, 60, "加速1", Color.RED);
-		VelometerSlot level2 = new VelometerSlot(2, 60, 120, "加速2",
+		VelometerSlot level1 = new VelometerSlot(-1, 0, 60, "减速1", Color.RED);
+		VelometerSlot level2 = new VelometerSlot(-2, 60, 120, "减速2",
 				Color.MAGENTA);
-		VelometerSlot level3 = new VelometerSlot(3, 120, 180, "加速3", Color.BLUE);
-		VelometerSlot level4 = new VelometerSlot(-3, 180, 240, "减速3",
+		VelometerSlot level3 = new VelometerSlot(-3, 120, 180, "减速3", Color.BLUE);
+		VelometerSlot level4 = new VelometerSlot(3, 180, 240, "加速3",
 				Color.CYAN);
-		VelometerSlot level5 = new VelometerSlot(-2, 240, 300, "减速2",
+		VelometerSlot level5 = new VelometerSlot(2, 240, 300, "加速2",
 				Color.DKGRAY);
-		VelometerSlot level6 = new VelometerSlot(-1, 300, 360, "减速1",
+		VelometerSlot level6 = new VelometerSlot(1, 300, 360, "加速1",
 				Color.GREEN);
 		List<VelometerSlot> slots = new ArrayList<VelometerSlot>();
 		slots.add(level1);
