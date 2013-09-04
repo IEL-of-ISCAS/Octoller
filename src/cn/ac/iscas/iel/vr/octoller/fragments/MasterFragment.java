@@ -92,9 +92,9 @@ public class MasterFragment extends Fragment {
 		VelometerSlot level1 = new VelometerSlot(-1, 0, 60, "减速1", Color.RED);
 		VelometerSlot level2 = new VelometerSlot(-2, 60, 120, "减速2",
 				Color.MAGENTA);
-		VelometerSlot level3 = new VelometerSlot(-3, 120, 180, "减速3", Color.BLUE);
-		VelometerSlot level4 = new VelometerSlot(3, 180, 240, "加速3",
-				Color.CYAN);
+		VelometerSlot level3 = new VelometerSlot(-3, 120, 180, "减速3",
+				Color.BLUE);
+		VelometerSlot level4 = new VelometerSlot(3, 180, 240, "加速3", Color.CYAN);
 		VelometerSlot level5 = new VelometerSlot(2, 240, 300, "加速2",
 				Color.DKGRAY);
 		VelometerSlot level6 = new VelometerSlot(1, 300, 360, "加速1",
@@ -145,14 +145,8 @@ public class MasterFragment extends Fragment {
 						mMainActivity.resumeSensor();
 						mMainActivity.getDevice().setCurrentMsgType(
 								Frame.MSG_TYPE_FLIGHTMANIPULATOR);
-						
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} // sleep 100 ms
-						
-						mMainActivity.getDevice().startSampling(RotationSensor.getMyName());
+						mMainActivity.getDevice().startSampling(
+								RotationSensor.getMyName());
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
 					}
@@ -192,12 +186,9 @@ public class MasterFragment extends Fragment {
 						mMainActivity.resumeSensor();
 						mMainActivity.getDevice().setCurrentMsgType(
 								Frame.MSG_TYPE_DRIVEMANIPULATOR);
-						try {
-							Thread.sleep(100);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						} // sleep 100 ms
-						mMainActivity.getDevice().startSampling(RotationSensor.getMyName(), VelometerSensor.getMyName());
+						mMainActivity.getDevice().startSampling(
+								RotationSensor.getMyName(),
+								VelometerSensor.getMyName());
 					} catch (MultipleSampleThreadException e) {
 						e.printStackTrace();
 					}
@@ -227,7 +218,7 @@ public class MasterFragment extends Fragment {
 						new MultiTouchFragment(), "multiTouchFragment", true);
 			}
 		});
-		
+
 		mBtnMaps = (Button) view.findViewById(R.id.btn_mani_map);
 		mBtnMaps.setOnClickListener(new View.OnClickListener() {
 

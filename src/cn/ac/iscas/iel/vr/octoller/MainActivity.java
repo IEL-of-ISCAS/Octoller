@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
 		ControlMessageUtils.setActivty(this);
 
 		mDevice = new Device("android");
-		mDevice.setSampleRate(30);
+		mDevice.setSampleRate(20);
 		mChannelResponse = new ChannelResponseCallback();
 
 		mSensorManager = (SensorManager) getSystemService(Service.SENSOR_SERVICE);
