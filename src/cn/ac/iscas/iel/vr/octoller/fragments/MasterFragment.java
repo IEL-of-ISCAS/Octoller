@@ -80,7 +80,7 @@ public class MasterFragment extends Fragment {
 
 		mMainActivity = (MainActivity) this.getActivity();
 		setupViews(this.getView());
-
+		
 		mLayoutRoot = (ViewGroup) this.getView().findViewById(R.id.layout_root);
 
 		LayoutInflater inflater = (LayoutInflater) mMainActivity
@@ -131,7 +131,6 @@ public class MasterFragment extends Fragment {
 	 * Helper functions
 	 */
 	protected void setupViews(View view) {
-
 		mBtnManiFlight = (Button) view.findViewById(R.id.btn_mani_flight);
 		mBtnManiFlight.setOnTouchListener(new View.OnTouchListener() {
 

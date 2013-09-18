@@ -28,6 +28,7 @@ import cn.ac.iscas.iel.csdtp.data.ResponseData;
 import cn.ac.iscas.iel.csdtp.data.SensorData;
 import cn.ac.iscas.iel.csdtp.exception.ChangeSensorWhileCollectingDataException;
 import cn.ac.iscas.iel.vr.octoller.fragments.MasterFragment;
+import cn.ac.iscas.iel.vr.octoller.fragments.PickFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.SlaveryFragment;
 import cn.ac.iscas.iel.vr.octoller.fragments.WelcomeFragment;
 import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
@@ -104,11 +105,10 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		
-		
+
 		ControlMessageUtils.releaseControl();
 		ControlMessageUtils.disconnect();
-		while(mDevice.getOutQueue().size() != 0) {
+		while (mDevice.getOutQueue().size() != 0) {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -136,7 +136,7 @@ public class MainActivity extends Activity {
 	public MultiTouchEventListener getMatrixCallback() {
 		return mGestureCallback;
 	}
-	
+
 	public IViewportChangedListener getViewportCallback() {
 		return mCameraCallback;
 	}
@@ -244,7 +244,7 @@ public class MainActivity extends Activity {
 		}
 
 	}
-	
+
 	protected class ViewportChangedCallback implements IViewportChangedListener {
 
 		@Override
@@ -253,7 +253,7 @@ public class MainActivity extends Activity {
 			SensorData<float[]> touchData = new SensorData<float[]>(touchArray);
 			mTouchSensor.updateSnapshot(touchData);
 		}
-		
+
 	}
 
 	protected class ChannelResponseCallback implements IChannelCallback {
@@ -288,6 +288,15 @@ public class MainActivity extends Activity {
 			} else if (data.getMsgType() == Frame.MSG_TYPE_GIVEUPCONTROL) {
 				FragmentTransactionHelper.transTo(MainActivity.this,
 						new SlaveryFragment(), "slaveryFragment", false);
+			} else if (data.getMsgType() == Frame.MSG_TYPE_PICK) {
+				if (data.getStatus() == Frame.STATUS_SUCCESS) {
+					FragmentTransactionHelper.transTo(MainActivity.this,
+							new PickFragment(), "pickFragment", false);
+				} else {
+					Toast.makeText(MainActivity.this,
+							R.string.hint_nothing_selected, Toast.LENGTH_LONG)
+							.show();
+				}
 			}
 		}
 

@@ -33,9 +33,8 @@ import cn.ac.iscas.iel.vr.octoller.utils.ControlMessageUtils;
  * @since
  */
 public class SlaveryFragment extends Fragment {
-
 	protected MainActivity mMainActivity;
-	protected View mBtnResetPhoneState;
+	protected View mBtnPhonePick;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -55,12 +54,16 @@ public class SlaveryFragment extends Fragment {
 		super.onActivityCreated(savedInstanceState);
 		mMainActivity = (MainActivity) this.getActivity();
 		
-		mBtnResetPhoneState = getView().findViewById(R.id.iv_octopus);
-		mBtnResetPhoneState.setOnClickListener(new View.OnClickListener() {
+		setupView(getView());
+	}
+	
+	private void setupView(View view) {
+		mBtnPhonePick = view.findViewById(R.id.btn_lock_view);
+		mBtnPhonePick.setOnClickListener(new View.OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
-				ControlMessageUtils.resetPhoneState();
+				ControlMessageUtils.doPick();
 			}
 		});
 	}

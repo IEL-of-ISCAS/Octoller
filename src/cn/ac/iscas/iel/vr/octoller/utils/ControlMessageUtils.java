@@ -71,5 +71,19 @@ public class ControlMessageUtils {
 				Frame.MSG_TYPE_PHONE_POSITION);
 		mainDevice.pushToSendQueue(frame);
 	}
+	
+	public static void doPick() {
+		Device mainDevice = mActivity.getDevice();
+		DataFrame frame = new DataFrame(mainDevice, 
+				Frame.MSG_TYPE_PICK);
+		mainDevice.pushToSendQueue(frame);
+	}
+	
+	public static void doUnpick() {
+		Device mainDevice = mActivity.getDevice();
+		DataFrame frame = new DataFrame(mainDevice, 
+				Frame.MSG_TYPE_UNPICK);
+		mainDevice.pushToSendQueue(frame);
+	}
 
 }
