@@ -15,7 +15,7 @@ import java.util.UUID;
 public class Constants {
 	// Server config
 	// TODO change to auto-detection
-	public static final String SERVER_IP = "192.168.0.168";
+	public static final String SERVER_IP = "192.168.1.100";
 	public static final int SERVER_PORT = 6666;
 
 	public static final UUID BT_UUID = UUID

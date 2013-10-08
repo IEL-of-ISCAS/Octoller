@@ -8,6 +8,6 @@
         android:id="@+id/tily"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        custom:base_url="http://192.168.0.168/~voidmain/tily/earth" />
+        custom:base_url="http://192.168.1.101/~voidmain/city_tily" />
 
 </RelativeLayout>

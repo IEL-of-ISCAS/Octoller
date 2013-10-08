@@ -42,6 +42,10 @@ public class MainActivity extends Activity {
 	private RotationSensor mRotSensor;
 	private VelometerSensor mVeloSensor;
 	private TouchScreenSensor mTouchSensor;
+	
+	public RotationSensor getRotationSensor() {
+		return mRotSensor;
+	}
 
 	private SensorManager mSensorManager;
 	private Sensor mPhyRotSensor;
@@ -293,9 +297,11 @@ public class MainActivity extends Activity {
 					FragmentTransactionHelper.transTo(MainActivity.this,
 							new PickFragment(), "pickFragment", false);
 				} else {
-					Toast.makeText(MainActivity.this,
-							R.string.hint_nothing_selected, Toast.LENGTH_LONG)
-							.show();
+					Message msg = new Message();
+					msg.what = Constants.MSG_REQUEST_ERROR;
+					msg.arg1 = data.getMsgType();
+					msg.obj = getString(R.string.hint_nothing_selected);
+					mMsgHandler.sendMessage(msg);
 				}
 			}
 		}

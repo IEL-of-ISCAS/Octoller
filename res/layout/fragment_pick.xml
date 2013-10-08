@@ -1,6 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
 
-</RelativeLayout>
+    <Button
+        android:id="@+id/btn_move_up"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/text_move_up" />
+
+    <Button
+        android:id="@+id/btn_move_down"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/text_move_down" />
+
+    <Button
+        android:id="@+id/btn_move_left"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/text_move_left" />
+
+    <Button
+        android:id="@+id/btn_move_right"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/text_move_right" />
+
+    <Button
+        android:id="@+id/btn_move_in"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/text_move_in" />
+
+    <Button
+        android:id="@+id/btn_move_out"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/text_move_out" />
+
+    <Button
+        android:id="@+id/btn_move_clockwise"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/text_move_clockwise" />
+
+    <Button
+        android:id="@+id/btn_move_counter_clockwise"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/text_move_counterclockwise" />
+
+</LinearLayout>

@@ -10,7 +10,7 @@
     <string name="action_disconnect">断开</string>
     <string name="action_release_master">释放控制权</string>
     <string name="action_go_back">返回</string>
-    <string name="manipulator_pen_speech">笔和语音</string>
+    <string name="manipulator_speech">语音交互</string>
     <string name="manipulator_flight">飞行器</string>
     <string name="manipulator_drive">驾驶</string>
     <string name="manipulator_maps">缩略图</string>
@@ -27,14 +27,22 @@
     <string name="title_other_devices">其他可配对设备</string>
     <string name="button_scan">搜索设备</string>
     <string name="none_paired">没有已配对设备</string>
-    <string name="scanning">设备搜索中...</string>
+    <string name="scanning">设备搜索中</string>
     <string name="none_found">没有找到设备</string>
     <string name="select_device">请选择一个要进行连接的设备</string>
     <string name="connect">连接一个设备</string>
     <string name="discoverable">将本设备设成可见</string>
     <string name="title_connected_to">已连接的设备：</string>
-    <string name="title_connecting">连接中...</string>
+    <string name="title_connecting">连接中</string>
     <string name="title_not_connected">没有连接</string>
+    <string name="text_move_up">上移</string>
+    <string name="text_move_down">下移</string>
+    <string name="text_move_left">左移</string>
+    <string name="text_move_right">右移</string>
+    <string name="text_move_in">内移</string>
+    <string name="text_move_out">外移</string>
+    <string name="text_move_clockwise">顺时针</string>
+    <string name="text_move_counterclockwise">逆时针</string>
 
     <string name="error_base_url_not_specified">Please specify base_url for ATily widget.</string>
     <string name="error_network_timeout">Network timeout.</string>
